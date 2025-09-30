@@ -21,16 +21,14 @@ namespace Convocatorias.Api.Controllers
         [HttpPost("insertar")]
         public async Task<IActionResult> Insertar([FromBody] ConvocatoriaFaseInsertarDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             var result = await _service.RegistrarFaseAsync(dto);
-            return Ok(result);
+            if (result.Codigo == 1) return Ok(result);
 
-
+            return BadRequest(result);
         }
 
-        // ✅ Nuevo endpoint para insertar varias fases
         [Authorize(Roles = "1")]
         [HttpPost("insertar-multiple")]
         public async Task<IActionResult> InsertarVarias([FromBody] List<ConvocatoriaFaseInsertarDto> fases)
@@ -38,23 +36,62 @@ namespace Convocatorias.Api.Controllers
             if (fases == null || fases.Count == 0)
                 return BadRequest("Debe proporcionar al menos una fase.");
 
-            var result = await _service.RegistrarVariasFasesAsync(fases);
-            return Ok(result);
+            // Validar duplicados por estado
+            var duplicados = fases.GroupBy(f => f.CodEstado)
+                                  .Where(g => g.Count() > 1)
+                                  .Select(g => g.Key)
+                                  .ToList();
+            if (duplicados.Any())
+                return BadRequest($"Existen fases duplicadas con los mismos estados: {string.Join(", ", duplicados)}");
+
+            // Validar fechas solapadas dentro de la lista
+            var ordenadas = fases.OrderBy(f => f.FechaInicio).ToList();
+            for (int i = 0; i < ordenadas.Count - 1; i++)
+            {
+                if (ordenadas[i].FechaFin >= ordenadas[i + 1].FechaInicio)
+                    return BadRequest("Existen fases con fechas solapadas entre sí.");
+            }
+
+            try
+            {
+                var result = await _service.RegistrarVariasFasesAsync(fases);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Mensaje = ex.Message });
+            }
         }
 
-       // [Authorize] // todos los usuarios autenticados pueden consultar
         [HttpGet("listar/{iCodConvocatoria}")]
         public async Task<IActionResult> ListarPorConvocatoria(int iCodConvocatoria)
         {
-            if (iCodConvocatoria <= 0)
-                return BadRequest("El código de convocatoria es inválido.");
+            if (iCodConvocatoria <= 0) return BadRequest("El código de convocatoria es inválido.");
 
             var fases = await _service.ListarPorConvocatoriaAsync(iCodConvocatoria);
-
-            if (fases == null || !fases.Any())
-                return NotFound("No se encontraron fases para esta convocatoria.");
+            if (fases == null || !fases.Any()) return NotFound("No se encontraron fases para esta convocatoria.");
 
             return Ok(fases);
+        }
+
+        [HttpDelete("{iCodFase}")]
+        public async Task<IActionResult> EliminarFase(int iCodFase)
+        {
+            var result = await _service.EliminarFaseAsync(iCodFase);
+            if (result.Codigo == 1) return Ok(result);
+
+            return BadRequest(result);
+        }
+
+        [HttpPut("actualizar")]
+        public async Task<IActionResult> Actualizar([FromBody] ConvocatoriaFaseActualizarDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var result = await _service.ActualizarFaseAsync(dto);
+            if (result.Codigo == 1) return Ok(result);
+
+            return BadRequest(result);
         }
     }
 }

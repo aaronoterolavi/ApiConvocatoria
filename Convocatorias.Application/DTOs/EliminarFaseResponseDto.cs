@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Convocatorias.Application.DTOs
+{
+    public class EliminarFaseResponseDto
+    {
+        public int IdEliminado { get; set; }
+        public string Mensaje { get; set; } = string.Empty;
+        public int Codigo { get; set; }
+    }
+}

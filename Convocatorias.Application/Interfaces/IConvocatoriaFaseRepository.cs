@@ -10,6 +10,8 @@ namespace Convocatorias.Application.Interfaces
     public interface IConvocatoriaFaseRepository
     {
         Task<ConvocatoriaFaseResponseDto> InsertarAsync(ConvocatoriaFaseInsertarDto dto);
+        Task<ConvocatoriaFaseResponseDto> ActualizarAsync(ConvocatoriaFaseActualizarDto dto); // nuevo
         Task<IEnumerable<ConvocatoriaFaseDto>> ListarPorConvocatoriaAsync(int iCodConvocatoria);
+        Task<EliminarFaseResponseDto> EliminarAsync(int iCodFase);
     }
 }
