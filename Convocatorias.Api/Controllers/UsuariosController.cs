@@ -71,25 +71,30 @@ namespace Convocatorias.Api.Controllers
         }
 
         // Listar usuarios — protegido, solo rol = 3 puede acceder
-        [Authorize]
+       // [Authorize]
         [HttpGet("listar")]
-        public async Task<IActionResult> Listar()
+        public async Task<IActionResult> Listar(
+    int pageNumber = 1,
+    int pageSize = 10,
+    int? codRol = null,
+    string? correo = null,
+    string? nombreCompleto = null)
         {
-            // Intentamos leer el claim "CodRol" (si no existe, intentamos Role / "role")
+            // Intentamos leer el claim "CodRol"
             var rolClaim = User.FindFirst("CodRol")?.Value
                           ?? User.FindFirst(ClaimTypes.Role)?.Value
                           ?? User.FindFirst("role")?.Value;
 
-            if (string.IsNullOrEmpty(rolClaim) || !int.TryParse(rolClaim, out var codRol))
+            if (string.IsNullOrEmpty(rolClaim) || !int.TryParse(rolClaim, out var rolUsuario))
                 return Forbid();
 
-            if (codRol != 1)
+            // Solo usuarios con rol 1 o 2 pueden listar
+            if (rolUsuario != 1 )
                 return Forbid();
 
-            var usuarios = await _repo.ListarAsync();
-            return Ok(usuarios);
+            var result = await _repo.ListarAsync(pageNumber, pageSize, codRol, correo, nombreCompleto);
+            return Ok(result);
         }
-
 
         // 1) Solicitar restablecimiento
         [HttpPost("olvide-contrasena")]
@@ -154,6 +159,65 @@ namespace Convocatorias.Api.Controllers
 
             return Ok(new ResetPasswordResponseDto { Exito = true, Mensaje = "Contraseña restablecida correctamente." });
         }
+
+
+        [Authorize]
+        [HttpDelete("eliminar/{idUsuario}")]
+        public async Task<IActionResult> Eliminar(int idUsuario)
+        {
+            var rolClaim = User.FindFirst("CodRol")?.Value
+                          ?? User.FindFirst(ClaimTypes.Role)?.Value
+                          ?? User.FindFirst("role")?.Value;
+
+            if (string.IsNullOrEmpty(rolClaim) || !int.TryParse(rolClaim, out var rolUsuario))
+                return Forbid();
+
+            if (rolUsuario != 1 )
+                return Forbid();
+
+            var result = await _repo.EliminarAsync(idUsuario);
+
+            if (result.Codigo == 1)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
+
+        [Authorize]
+        [HttpPut("actualizar/{idUsuario}")]
+        public async Task<IActionResult> Actualizar(
+    int idUsuario,
+    [FromBody] UsuarioActualizarRequest request)
+        {
+            var rolClaim = User.FindFirst("CodRol")?.Value
+                          ?? User.FindFirst(ClaimTypes.Role)?.Value
+                          ?? User.FindFirst("role")?.Value;
+
+            if (string.IsNullOrEmpty(rolClaim) || !int.TryParse(rolClaim, out var rolUsuario))
+                return Forbid();
+
+            if (rolUsuario != 1 && rolUsuario != 2)
+                return Forbid();
+
+            var result = await _repo.ActualizarAsync(
+                idUsuario,
+                request.TipoDocumento,
+                request.NumDocumento,
+                request.ApePaterno,
+                request.ApeMaterno,
+                request.Nombres,
+                request.CorreoElectronico,
+                request.Contrasenia,
+                request.CodRol,
+                request.Activo
+            );
+
+            if (result.Codigo == 1)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
+
     }
 
 

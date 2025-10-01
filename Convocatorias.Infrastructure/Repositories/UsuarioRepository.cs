@@ -123,9 +123,15 @@ namespace Convocatorias.Infrastructure.Repositories
         }
 
         // Listar usuarios (solo se llama si rol=3 en el controlador)
-        public async Task<IEnumerable<UsuarioListarDto>> ListarAsync()
+        public async Task<PagedResult<UsuarioListarDto>> ListarAsync(
+     int pageNumber,
+     int pageSize,
+     int? codRol = null,
+     string? correo = null,
+     string? nombreCompleto = null)
         {
             var usuarios = new List<UsuarioListarDto>();
+            int totalRegistros = 0;
 
             using var conn = new SqlConnection(_connectionString);
             using var cmd = new SqlCommand("USP_Usuarios_Listar", conn)
@@ -133,9 +139,16 @@ namespace Convocatorias.Infrastructure.Repositories
                 CommandType = CommandType.StoredProcedure
             };
 
+            cmd.Parameters.AddWithValue("@PageNumber", pageNumber);
+            cmd.Parameters.AddWithValue("@PageSize", pageSize);
+            cmd.Parameters.AddWithValue("@iCodRol", (object?)codRol ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@vCorreo", (object?)correo ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@vNombreCompleto", (object?)nombreCompleto ?? DBNull.Value);
+
             await conn.OpenAsync();
             using var reader = await cmd.ExecuteReaderAsync();
 
+            // --- Primer resultset: lista de usuarios ---
             while (await reader.ReadAsync())
             {
                 usuarios.Add(new UsuarioListarDto
@@ -153,8 +166,19 @@ namespace Convocatorias.Infrastructure.Repositories
                 });
             }
 
-            return usuarios;
+            // --- Segundo resultset: total de registros ---
+            if (await reader.NextResultAsync() && await reader.ReadAsync())
+            {
+                totalRegistros = reader.GetInt32(reader.GetOrdinal("TotalRegistros"));
+            }
+
+            return new PagedResult<UsuarioListarDto>
+            {
+                Items = usuarios,
+                TotalRegistros = totalRegistros
+            };
         }
+
 
         // Generar JWT
         private string GenerarToken(string correo, int codUsuario, int codRol)
@@ -263,6 +287,81 @@ namespace Convocatorias.Infrastructure.Repositories
             }
             return false;
         }
+
+        public async Task<UsuarioEliminarDto> EliminarAsync(int idUsuario)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            using var cmd = new SqlCommand("USP_Usuarios_Eliminar", conn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            cmd.Parameters.AddWithValue("@iCodUsuario", idUsuario);
+
+            await conn.OpenAsync();
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            if (await reader.ReadAsync())
+            {
+                return new UsuarioEliminarDto
+                {
+                    Mensaje = reader["Mensaje"]?.ToString() ?? string.Empty,
+                    Codigo = reader["Codigo"] != DBNull.Value ? Convert.ToInt32(reader["Codigo"]) : 0
+                };
+            }
+
+            return new UsuarioEliminarDto { Mensaje = "Error inesperado", Codigo = 0 };
+        }
+
+        public async Task<UsuarioActualizarDto> ActualizarAsync(
+    int idUsuario,
+    int tipoDocumento,
+    string numDocumento,
+    string apePaterno,
+    string apeMaterno,
+    string nombres,
+    string correoElectronico,
+    string contrasenia,
+    int codRol,
+    bool activo)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            using var cmd = new SqlCommand("USP_Usuarios_Actualizar", conn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            cmd.Parameters.AddWithValue("@iCodUsuario", idUsuario);
+            cmd.Parameters.AddWithValue("@iTipoDocumento", tipoDocumento);
+            cmd.Parameters.AddWithValue("@vNumDocumento", numDocumento);
+            cmd.Parameters.AddWithValue("@vApePaterno", apePaterno);
+            cmd.Parameters.AddWithValue("@vApeMaterno", apeMaterno);
+            cmd.Parameters.AddWithValue("@vNombres", nombres);
+            cmd.Parameters.AddWithValue("@vCorreoElectronico", correoElectronico);
+            string? hashedPassword = null;
+            if (!string.IsNullOrWhiteSpace(contrasenia))
+            {
+                hashedPassword = _passwordHasher.HashPassword(null, contrasenia);
+            }
+        
+            cmd.Parameters.AddWithValue("@iCodRol", codRol);
+            cmd.Parameters.AddWithValue("@bActivo", activo);
+
+            await conn.OpenAsync();
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            if (await reader.ReadAsync())
+            {
+                return new UsuarioActualizarDto
+                {
+                    Mensaje = reader["Mensaje"]?.ToString() ?? string.Empty,
+                    Codigo = reader["Codigo"] != DBNull.Value ? Convert.ToInt32(reader["Codigo"]) : 0
+                };
+            }
+
+            return new UsuarioActualizarDto { Mensaje = "Error inesperado", Codigo = 0 };
+        }
+
 
     }
 
