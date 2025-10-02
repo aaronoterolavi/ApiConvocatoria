@@ -343,7 +343,9 @@ namespace Convocatorias.Infrastructure.Repositories
             {
                 hashedPassword = _passwordHasher.HashPassword(null, contrasenia);
             }
-        
+
+            cmd.Parameters.AddWithValue("@vContrasenia", hashedPassword);
+
             cmd.Parameters.AddWithValue("@iCodRol", codRol);
             cmd.Parameters.AddWithValue("@bActivo", activo);
 
