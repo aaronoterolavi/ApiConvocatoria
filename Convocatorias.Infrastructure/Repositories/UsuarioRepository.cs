@@ -347,7 +347,7 @@ namespace Convocatorias.Infrastructure.Repositories
             cmd.Parameters.AddWithValue("@vContrasenia", hashedPassword);
 
             cmd.Parameters.AddWithValue("@iCodRol", codRol);
-            cmd.Parameters.AddWithValue("@bActivo", activo);
+            cmd.Parameters.AddWithValue("@bActivo", 1);
 
             await conn.OpenAsync();
             using var reader = await cmd.ExecuteReaderAsync();
