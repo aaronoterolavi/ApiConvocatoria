@@ -22,8 +22,9 @@ namespace Convocatorias.Application.Interfaces
     string nombres,
     string correoElectronico,
     string contrasenia,
-    int codRol,
-    bool activo);
+    int codRol
+    //bool activo
+            );
         Task<int?> GetUserIdByEmailAsync(string correo);
         Task<bool> SavePasswordResetTokenAsync(int userId, string token, DateTime expiracion);
         Task<int?> GetUserIdByResetTokenAsync(string token); // devuelve userId si válido, null si no

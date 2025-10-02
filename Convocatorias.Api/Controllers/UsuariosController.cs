@@ -208,8 +208,8 @@ namespace Convocatorias.Api.Controllers
                 request.Nombres,
                 request.CorreoElectronico,
                 request.Contrasenia,
-                request.CodRol,
-                request.Activo
+                request.CodRol
+               // request.Activo
             );
 
             if (result.Codigo == 1)

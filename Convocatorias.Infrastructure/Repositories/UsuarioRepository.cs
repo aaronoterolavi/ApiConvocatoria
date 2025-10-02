@@ -322,8 +322,9 @@ namespace Convocatorias.Infrastructure.Repositories
     string nombres,
     string correoElectronico,
     string contrasenia,
-    int codRol,
-    bool activo)
+    int codRol
+    //bool activo
+            )
         {
             using var conn = new SqlConnection(_connectionString);
             using var cmd = new SqlCommand("USP_Usuarios_Actualizar", conn)
@@ -347,7 +348,7 @@ namespace Convocatorias.Infrastructure.Repositories
             cmd.Parameters.AddWithValue("@vContrasenia", hashedPassword);
 
             cmd.Parameters.AddWithValue("@iCodRol", codRol);
-            cmd.Parameters.AddWithValue("@bActivo", 1);
+            //cmd.Parameters.AddWithValue("@bActivo", 1);
 
             await conn.OpenAsync();
             using var reader = await cmd.ExecuteReaderAsync();

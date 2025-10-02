@@ -16,6 +16,6 @@ namespace Convocatorias.Application.DTOs
         public string CorreoElectronico { get; set; } = string.Empty;
         public string Contrasenia { get; set; } = string.Empty;
         public int CodRol { get; set; }
-        public bool Activo { get; set; }
+       // public bool Activo { get; set; }
     }
 }
