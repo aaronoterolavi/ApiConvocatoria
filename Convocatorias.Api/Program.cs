@@ -100,6 +100,27 @@ builder.Services.AddScoped<UnidadZonalService>();
 builder.Services.AddScoped<ITipoDocumentoRepository, TipoDocumentoRepository>();
 builder.Services.AddScoped<TipoDocumentoService>();
 
+builder.Services.AddScoped<IPostulanteRepository, PostulanteRepository>();
+builder.Services.AddScoped<PostulanteService>();
+
+builder.Services.AddScoped<IFormacionAcademicaRepository, FormacionAcademicaRepository>();
+builder.Services.AddScoped<FormacionAcademicaService>();
+
+builder.Services.AddScoped<IColegiaturaRepository, ColegiaturaRepository>();
+builder.Services.AddScoped<ColegiaturaService>();
+
+builder.Services.AddScoped<IExperienciaLaboralRepository, ExperienciaLaboralRepository>();
+builder.Services.AddScoped<ExperienciaLaboralService>();
+
+builder.Services.AddScoped<ICursoDiplomadoRepository, CursoDiplomadoRepository>();
+builder.Services.AddScoped<CursoDiplomadoService>();
+
+builder.Services.AddScoped<IIdiomaRepository, IdiomaRepository>();
+builder.Services.AddScoped<IdiomaService>();
+
+builder.Services.AddScoped<IOfimaticaNivelIntermedioRepository, OfimaticaNivelIntermedioRepository>();
+builder.Services.AddScoped<OfimaticaNivelIntermedioService>();
+
 // -----------------------------------------------------------------------------
 // Controllers y Swagger
 // -----------------------------------------------------------------------------
