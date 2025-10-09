@@ -10,9 +10,9 @@ namespace Convocatorias.Application.DTOs
         public DateTime? FechaNacimiento { get; set; }
         public int? CodSexo { get; set; }
         public int? CodEstadoCivil { get; set; }
-        public int? CodDepartamento { get; set; }
-        public int? CodProvincia { get; set; }
-        public int? CodDistrito { get; set; }
+        public string? CodDepartamento { get; set; }
+        public string? CodProvincia { get; set; }
+        public string? CodDistrito { get; set; }
         public string? Domicilio { get; set; }
         public string? Celular { get; set; }
         public string? Telefono { get; set; }

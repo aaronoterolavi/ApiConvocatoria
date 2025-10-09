@@ -40,9 +40,9 @@ namespace Convocatorias.Infrastructure.Repositories
                             FechaNacimiento = reader.IsDBNull(reader.GetOrdinal("dFechaNacimiento")) ? null : reader.GetDateTime(reader.GetOrdinal("dFechaNacimiento")),
                             CodSexo = reader.IsDBNull(reader.GetOrdinal("iCodSexo")) ? null : reader.GetInt32(reader.GetOrdinal("iCodSexo")),
                             CodEstadoCivil = reader.IsDBNull(reader.GetOrdinal("iCodEstadoCivil")) ? null : reader.GetInt32(reader.GetOrdinal("iCodEstadoCivil")),
-                            CodDepartamento = reader.IsDBNull(reader.GetOrdinal("iCodDepartamento")) ? null : reader.GetInt32(reader.GetOrdinal("iCodDepartamento")),
-                            CodProvincia = reader.IsDBNull(reader.GetOrdinal("iCodProvincia")) ? null : reader.GetInt32(reader.GetOrdinal("iCodProvincia")),
-                            CodDistrito = reader.IsDBNull(reader.GetOrdinal("iCodDistrito")) ? null : reader.GetInt32(reader.GetOrdinal("iCodDistrito")),
+                            CodDepartamento = reader.IsDBNull(reader.GetOrdinal("vCodDepartamento")) ? null : reader.GetString(reader.GetOrdinal("vCodDepartamento")),
+                            CodProvincia = reader.IsDBNull(reader.GetOrdinal("vCodProvincia")) ? null : reader.GetString(reader.GetOrdinal("vCodProvincia")),
+                            CodDistrito = reader.IsDBNull(reader.GetOrdinal("vCodDistrito")) ? null : reader.GetString(reader.GetOrdinal("vCodDistrito")),
                             Domicilio = reader["vDomicilio"] as string,
                             Celular = reader["vCelular"] as string,
                             Telefono = reader["vTelefono"] as string,
@@ -79,9 +79,9 @@ namespace Convocatorias.Infrastructure.Repositories
                             FechaNacimiento = reader.IsDBNull(reader.GetOrdinal("dFechaNacimiento")) ? null : reader.GetDateTime(reader.GetOrdinal("dFechaNacimiento")),
                             CodSexo = reader.IsDBNull(reader.GetOrdinal("iCodSexo")) ? null : reader.GetInt32(reader.GetOrdinal("iCodSexo")),
                             CodEstadoCivil = reader.IsDBNull(reader.GetOrdinal("iCodEstadoCivil")) ? null : reader.GetInt32(reader.GetOrdinal("iCodEstadoCivil")),
-                            CodDepartamento = reader.IsDBNull(reader.GetOrdinal("iCodDepartamento")) ? null : reader.GetInt32(reader.GetOrdinal("iCodDepartamento")),
-                            CodProvincia = reader.IsDBNull(reader.GetOrdinal("iCodProvincia")) ? null : reader.GetInt32(reader.GetOrdinal("iCodProvincia")),
-                            CodDistrito = reader.IsDBNull(reader.GetOrdinal("iCodDistrito")) ? null : reader.GetInt32(reader.GetOrdinal("iCodDistrito")),
+                            CodDepartamento = reader.IsDBNull(reader.GetOrdinal("vCodDepartamento")) ? null : reader.GetString(reader.GetOrdinal("vCodDepartamento")),
+                            CodProvincia = reader.IsDBNull(reader.GetOrdinal("vCodProvincia")) ? null : reader.GetString(reader.GetOrdinal("vCodProvincia")),
+                            CodDistrito = reader.IsDBNull(reader.GetOrdinal("vCodDistrito")) ? null : reader.GetString(reader.GetOrdinal("vCodDistrito")),
                             Domicilio = reader["vDomicilio"] as string,
                             Celular = reader["vCelular"] as string,
                             Telefono = reader["vTelefono"] as string,
@@ -108,9 +108,9 @@ namespace Convocatorias.Infrastructure.Repositories
                 command.Parameters.AddWithValue("@dFechaNacimiento", (object?)postulante.FechaNacimiento ?? DBNull.Value);
                 command.Parameters.AddWithValue("@iCodSexo", (object?)postulante.CodSexo ?? DBNull.Value);
                 command.Parameters.AddWithValue("@iCodEstadoCivil", (object?)postulante.CodEstadoCivil ?? DBNull.Value);
-                command.Parameters.AddWithValue("@iCodDepartamento", (object?)postulante.CodDepartamento ?? DBNull.Value);
-                command.Parameters.AddWithValue("@iCodProvincia", (object?)postulante.CodProvincia ?? DBNull.Value);
-                command.Parameters.AddWithValue("@iCodDistrito", (object?)postulante.CodDistrito ?? DBNull.Value);
+                command.Parameters.AddWithValue("@vCodDepartamento", (object?)postulante.CodDepartamento ?? DBNull.Value);
+                command.Parameters.AddWithValue("@vCodProvincia", (object?)postulante.CodProvincia ?? DBNull.Value);
+                command.Parameters.AddWithValue("@vCodDistrito", (object?)postulante.CodDistrito ?? DBNull.Value);
                 command.Parameters.AddWithValue("@vDomicilio", (object?)postulante.Domicilio ?? DBNull.Value);
                 command.Parameters.AddWithValue("@vCelular", (object?)postulante.Celular ?? DBNull.Value);
                 command.Parameters.AddWithValue("@vTelefono", (object?)postulante.Telefono ?? DBNull.Value);
@@ -146,9 +146,9 @@ namespace Convocatorias.Infrastructure.Repositories
                 command.Parameters.AddWithValue("@dFechaNacimiento", (object?)postulante.FechaNacimiento ?? DBNull.Value);
                 command.Parameters.AddWithValue("@iCodSexo", (object?)postulante.CodSexo ?? DBNull.Value);
                 command.Parameters.AddWithValue("@iCodEstadoCivil", (object?)postulante.CodEstadoCivil ?? DBNull.Value);
-                command.Parameters.AddWithValue("@iCodDepartamento", (object?)postulante.CodDepartamento ?? DBNull.Value);
-                command.Parameters.AddWithValue("@iCodProvincia", (object?)postulante.CodProvincia ?? DBNull.Value);
-                command.Parameters.AddWithValue("@iCodDistrito", (object?)postulante.CodDistrito ?? DBNull.Value);
+                command.Parameters.AddWithValue("@vCodDepartamento", (object?)postulante.CodDepartamento ?? DBNull.Value);
+                command.Parameters.AddWithValue("@vCodProvincia", (object?)postulante.CodProvincia ?? DBNull.Value);
+                command.Parameters.AddWithValue("@vCodDistrito", (object?)postulante.CodDistrito ?? DBNull.Value);
                 command.Parameters.AddWithValue("@vDomicilio", (object?)postulante.Domicilio ?? DBNull.Value);
                 command.Parameters.AddWithValue("@vCelular", (object?)postulante.Celular ?? DBNull.Value);
                 command.Parameters.AddWithValue("@vTelefono", (object?)postulante.Telefono ?? DBNull.Value);
