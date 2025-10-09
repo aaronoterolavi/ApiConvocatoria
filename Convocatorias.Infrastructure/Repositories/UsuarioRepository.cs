@@ -118,7 +118,7 @@ namespace Convocatorias.Infrastructure.Repositories
                 ApellidoPaterno = reader["vApePaterno"].ToString() ?? "",
                 ApellidoMaterno = reader["vApeMaterno"].ToString() ?? "",
                 TipoDocumento = Convert.ToInt32(reader["iTipoDocumento"]),
-                NroDocumento = reader["vApeMaterno"].ToString() ?? "",
+                NroDocumento = reader["vNumDocumento"].ToString() ?? "",
                 CodRol = codRol,
                 Activo = Convert.ToBoolean(reader["bActivo"]),
                 Token = token,
