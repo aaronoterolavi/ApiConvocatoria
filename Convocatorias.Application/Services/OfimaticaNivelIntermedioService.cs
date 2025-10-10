@@ -12,29 +12,9 @@ namespace Convocatorias.Application.Services
             _repository = repository;
         }
 
-        public int Insert(OfimaticaNivelIntermedioDTO dto)
-        {
-            return _repository.Insert(dto);
-        }
-
-        public void Update(int iCodOfimaticaNivelIntermedio, bool bTieneConocimiento)
-        {
-            _repository.Update(iCodOfimaticaNivelIntermedio, bTieneConocimiento);
-        }
-
-        public void Delete(int iCodOfimaticaNivelIntermedio)
-        {
-            _repository.Delete(iCodOfimaticaNivelIntermedio);
-        }
-
-        public OfimaticaNivelIntermedioDTO? GetById(int id)
-        {
-            return _repository.GetById(id);
-        }
-
-        public OfimaticaNivelIntermedioDTO? GetByPostulante(int iCodPostulante)
-        {
-            return _repository.GetByPostulante(iCodPostulante);
-        }
+        public string Insertar(OfimaticaNivelIntermedioDTO dto) => _repository.Insertar(dto);
+        public string Actualizar(OfimaticaNivelIntermedioDTO dto) => _repository.Actualizar(dto);
+        public string Eliminar(int id) => _repository.Eliminar(id);
+        public (List<OfimaticaNivelIntermedioDTO> lista, string mensaje) Listar(int? iCodUsuario = null) => _repository.Listar(iCodUsuario);
     }
 }

@@ -1,30 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Convocatorias.Application.DTOs;
+﻿using Convocatorias.Application.DTOs;
 using Convocatorias.Application.Interfaces;
 
 namespace Convocatorias.Application.Services
 {
     public class FormacionAcademicaService
     {
-        private readonly IFormacionAcademicaRepository _repository;
+        private readonly IFormacionAcademicaRepository _repo;
 
-        public FormacionAcademicaService(IFormacionAcademicaRepository repository)
+        public FormacionAcademicaService(IFormacionAcademicaRepository repo)
         {
-            _repository = repository;
+            _repo = repo;
         }
 
-        public Task<int> InsertarAsync(FormacionAcademicaDto dto) => _repository.InsertarAsync(dto);
+        public async Task<IEnumerable<FormacionAcademicaDTO>> ListarAsync() =>
+            await _repo.ListarAsync();
 
-        public Task<IEnumerable<FormacionAcademicaDto>> ListarAsync() => _repository.ListarAsync();
+        public async Task<IEnumerable<FormacionAcademicaDTO>> ListarPorUsuarioAsync(int iCodUsuario) =>
+            await _repo.ListarPorUsuarioAsync(iCodUsuario);
 
-        public Task<FormacionAcademicaDto?> ObtenerPorIdAsync(int id) => _repository.ObtenerPorIdAsync(id);
+        public async Task<int> InsertarAsync(FormacionAcademicaDTO dto) =>
+            await _repo.InsertarAsync(dto);
 
-        public Task<string> ActualizarAsync(FormacionAcademicaDto dto) => _repository.ActualizarAsync(dto);
+        public async Task ActualizarAsync(FormacionAcademicaDTO dto) =>
+            await _repo.ActualizarAsync(dto);
 
-        public Task<string> EliminarAsync(int id) => _repository.EliminarAsync(id);
+        public async Task EliminarAsync(int iCodFormacionAcademica) =>
+            await _repo.EliminarAsync(iCodFormacionAcademica);
     }
 }

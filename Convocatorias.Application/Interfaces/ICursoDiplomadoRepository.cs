@@ -9,10 +9,9 @@ namespace Convocatorias.Application.Interfaces
 {
     public interface ICursoDiplomadoRepository
     {
-        Task<int> InsertAsync(CursoDiplomadoDto dto);
-        Task<string> UpdateAsync(CursoDiplomadoDto dto);
-        Task<string> DeleteAsync(int id);
-        Task<CursoDiplomadoDto?> GetByIdAsync(int id);
-        Task<List<CursoDiplomadoDto>> GetByPostulanteAsync(int iCodPostulante);
+        Task InsertarAsync(CursoDiplomadoDTO entidad);
+        Task<IEnumerable<CursoDiplomadoDTO>> ListarAsync(int iCodUsuario);
+        Task ActualizarAsync(CursoDiplomadoDTO entidad);
+        Task EliminarAsync(int iCodCursoDiplomado);
     }
 }

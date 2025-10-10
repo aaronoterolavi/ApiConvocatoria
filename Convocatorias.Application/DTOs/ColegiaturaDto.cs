@@ -9,7 +9,7 @@ namespace Convocatorias.Application.DTOs
     public class ColegiaturaDto
     {
         public int iCodColegiatura { get; set; }
-        public int iCodPostulante { get; set; }
+        public int iCodUsuario { get; set; }
         public int iCodColegioProfesional { get; set; }
         public string vNroColegiatura { get; set; } = string.Empty;
         public bool bHabilitado { get; set; }

@@ -9,10 +9,9 @@ namespace Convocatorias.Application.Interfaces
 {
     public interface IOfimaticaNivelIntermedioRepository
     {
-        int Insert(OfimaticaNivelIntermedioDTO dto);
-        void Update(int iCodOfimaticaNivelIntermedio, bool bTieneConocimiento);
-        void Delete(int iCodOfimaticaNivelIntermedio);
-        OfimaticaNivelIntermedioDTO? GetById(int iCodOfimaticaNivelIntermedio);
-        OfimaticaNivelIntermedioDTO? GetByPostulante(int iCodPostulante);
+        string Insertar(OfimaticaNivelIntermedioDTO dto);
+        string Actualizar(OfimaticaNivelIntermedioDTO dto);
+        string Eliminar(int iCodOfimaticaNivelIntermedio);
+        (List<OfimaticaNivelIntermedioDTO> lista, string mensaje) Listar(int? iCodUsuario = null);
     }
 }

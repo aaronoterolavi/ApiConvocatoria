@@ -100,8 +100,8 @@ builder.Services.AddScoped<UnidadZonalService>();
 builder.Services.AddScoped<ITipoDocumentoRepository, TipoDocumentoRepository>();
 builder.Services.AddScoped<TipoDocumentoService>();
 
-builder.Services.AddScoped<IPostulanteRepository, PostulanteRepository>();
-builder.Services.AddScoped<PostulanteService>();
+builder.Services.AddScoped<IDatosPersonalesRepository, DatosPersonalesRepository>();
+builder.Services.AddScoped<DatosPersonalesService>();
 
 builder.Services.AddScoped<IFormacionAcademicaRepository, FormacionAcademicaRepository>();
 builder.Services.AddScoped<FormacionAcademicaService>();
@@ -120,6 +120,12 @@ builder.Services.AddScoped<IdiomaService>();
 
 builder.Services.AddScoped<IOfimaticaNivelIntermedioRepository, OfimaticaNivelIntermedioRepository>();
 builder.Services.AddScoped<OfimaticaNivelIntermedioService>();
+
+builder.Services.AddScoped<IBonificacionesAdicionalesRepository, BonificacionesAdicionalesRepository>();
+builder.Services.AddScoped<BonificacionesAdicionalesService>();
+
+builder.Services.AddScoped<IDeclaracionJuradaPostulanteRepository, DeclaracionJuradaPostulanteRepository>();
+builder.Services.AddScoped<DeclaracionJuradaPostulanteService>();
 
 // -----------------------------------------------------------------------------
 // Controllers y Swagger

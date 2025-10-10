@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Convocatorias.Application.DTOs;
+﻿using Convocatorias.Application.DTOs;
 using Convocatorias.Application.Interfaces;
 
 namespace Convocatorias.Application.Services
@@ -17,14 +12,14 @@ namespace Convocatorias.Application.Services
             _repository = repository;
         }
 
-        public Task<int> InsertarAsync(ColegiaturaDto dto) => _repository.InsertarAsync(dto);
+        public int Insertar(ColegiaturaDto dto) => _repository.Insertar(dto);
 
-        public Task<IEnumerable<ColegiaturaDto>> ListarAsync() => _repository.ListarAsync();
+        public void Actualizar(ColegiaturaDto dto) => _repository.Actualizar(dto);
 
-        public Task<ColegiaturaDto?> ObtenerPorIdAsync(int id) => _repository.ObtenerPorIdAsync(id);
+        public void Eliminar(int id) => _repository.Eliminar(id);
 
-        public Task<string> ActualizarAsync(ColegiaturaDto dto) => _repository.ActualizarAsync(dto);
+        public List<ColegiaturaDto> Listar() => _repository.Listar();
 
-        public Task<string> EliminarAsync(int id) => _repository.EliminarAsync(id);
+        public List<ColegiaturaDto> ListarPorUsuario(int iCodUsuario) => _repository.ListarPorUsuario(iCodUsuario);
     }
 }

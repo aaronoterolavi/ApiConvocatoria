@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
 using Convocatorias.Application.DTOs;
 using Convocatorias.Application.Interfaces;
@@ -16,103 +15,108 @@ namespace Convocatorias.Infrastructure.Repositories
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public int Insert(OfimaticaNivelIntermedioDTO dto)
+        public string Insertar(OfimaticaNivelIntermedioDTO dto)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
-            using (SqlCommand cmd = new SqlCommand("USP_OfimaticaNivelIntermedio_Insert", conn))
+            string mensaje = string.Empty;
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand("PA_InsertarOfimaticaNivelIntermedio", connection))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@iCodPostulante", dto.iCodPostulante);
+
+                cmd.Parameters.AddWithValue("@iCodUsuario", dto.iCodUsuario);
                 cmd.Parameters.AddWithValue("@bTieneConocimiento", dto.bTieneConocimiento);
                 cmd.Parameters.AddWithValue("@iCodUsuarioRegistra", dto.iCodUsuarioRegistra);
+                cmd.Parameters.Add("@Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
 
-                conn.Open();
-                object result = cmd.ExecuteScalar();
-                return Convert.ToInt32(result);
-            }
-        }
-
-        public void Update(int iCodOfimaticaNivelIntermedio, bool bTieneConocimiento)
-        {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
-            using (SqlCommand cmd = new SqlCommand("USP_OfimaticaNivelIntermedio_Update", conn))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@iCodOfimaticaNivelIntermedio", iCodOfimaticaNivelIntermedio);
-                cmd.Parameters.AddWithValue("@bTieneConocimiento", bTieneConocimiento);
-
-                conn.Open();
+                connection.Open();
                 cmd.ExecuteNonQuery();
+
+                mensaje = cmd.Parameters["@Mensaje"].Value.ToString();
             }
+
+            return mensaje;
         }
 
-        public void Delete(int iCodOfimaticaNivelIntermedio)
+        public string Actualizar(OfimaticaNivelIntermedioDTO dto)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
-            using (SqlCommand cmd = new SqlCommand("USP_OfimaticaNivelIntermedio_Delete", conn))
+            string mensaje = string.Empty;
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand("PA_ActualizarOfimaticaNivelIntermedio", connection))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@iCodOfimaticaNivelIntermedio", iCodOfimaticaNivelIntermedio);
 
-                conn.Open();
+                cmd.Parameters.AddWithValue("@iCodOfimaticaNivelIntermedio", dto.iCodOfimaticaNivelIntermedio);
+                cmd.Parameters.AddWithValue("@bTieneConocimiento", dto.bTieneConocimiento);
+                cmd.Parameters.AddWithValue("@iCodUsuarioRegistra", dto.iCodUsuarioRegistra);
+                cmd.Parameters.Add("@Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
+
+                connection.Open();
                 cmd.ExecuteNonQuery();
+
+                mensaje = cmd.Parameters["@Mensaje"].Value.ToString();
             }
+
+            return mensaje;
         }
 
-        public OfimaticaNivelIntermedioDTO? GetById(int iCodOfimaticaNivelIntermedio)
+        public string Eliminar(int iCodOfimaticaNivelIntermedio)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
-            using (SqlCommand cmd = new SqlCommand("USP_OfimaticaNivelIntermedio_GetById", conn))
+            string mensaje = string.Empty;
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand("PA_EliminarOfimaticaNivelIntermedio", connection))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@iCodOfimaticaNivelIntermedio", iCodOfimaticaNivelIntermedio);
 
-                conn.Open();
-                using (SqlDataReader reader = cmd.ExecuteReader())
+                cmd.Parameters.AddWithValue("@iCodOfimaticaNivelIntermedio", iCodOfimaticaNivelIntermedio);
+                cmd.Parameters.Add("@Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
+
+                connection.Open();
+                cmd.ExecuteNonQuery();
+
+                mensaje = cmd.Parameters["@Mensaje"].Value.ToString();
+            }
+
+            return mensaje;
+        }
+
+        public (List<OfimaticaNivelIntermedioDTO> lista, string mensaje) Listar(int? iCodUsuario = null)
+        {
+            var lista = new List<OfimaticaNivelIntermedioDTO>();
+            string mensaje = string.Empty;
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand("PA_ListarOfimaticaNivelIntermedio", connection))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@iCodUsuario", (object?)iCodUsuario ?? DBNull.Value);
+                cmd.Parameters.Add("@Mensaje", SqlDbType.VarChar, 500).Direction = ParameterDirection.Output;
+
+                connection.Open();
+
+                using (var reader = cmd.ExecuteReader())
                 {
-                    if (reader.Read())
+                    while (reader.Read())
                     {
-                        return new OfimaticaNivelIntermedioDTO
+                        lista.Add(new OfimaticaNivelIntermedioDTO
                         {
                             iCodOfimaticaNivelIntermedio = Convert.ToInt32(reader["iCodOfimaticaNivelIntermedio"]),
-                            iCodPostulante = Convert.ToInt32(reader["iCodPostulante"]),
+                            iCodUsuario = Convert.ToInt32(reader["iCodUsuario"]),
                             bTieneConocimiento = Convert.ToBoolean(reader["bTieneConocimiento"]),
                             dtFechaRegistro = Convert.ToDateTime(reader["dtFechaRegistro"]),
                             iCodUsuarioRegistra = Convert.ToInt32(reader["iCodUsuarioRegistra"]),
                             bActivo = Convert.ToBoolean(reader["bActivo"])
-                        };
+                        });
                     }
                 }
-            }
-            return null;
-        }
 
-        public OfimaticaNivelIntermedioDTO? GetByPostulante(int iCodPostulante)
-        {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
-            using (SqlCommand cmd = new SqlCommand("USP_OfimaticaNivelIntermedio_GetByPostulante", conn))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@iCodPostulante", iCodPostulante);
-
-                conn.Open();
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        return new OfimaticaNivelIntermedioDTO
-                        {
-                            iCodOfimaticaNivelIntermedio = Convert.ToInt32(reader["iCodOfimaticaNivelIntermedio"]),
-                            iCodPostulante = Convert.ToInt32(reader["iCodPostulante"]),
-                            bTieneConocimiento = Convert.ToBoolean(reader["bTieneConocimiento"]),
-                            dtFechaRegistro = Convert.ToDateTime(reader["dtFechaRegistro"]),
-                            iCodUsuarioRegistra = Convert.ToInt32(reader["iCodUsuarioRegistra"]),
-                            bActivo = Convert.ToBoolean(reader["bActivo"])
-                        };
-                    }
-                }
+                mensaje = cmd.Parameters["@Mensaje"].Value.ToString();
             }
-            return null;
+
+            return (lista, mensaje);
         }
     }
 }

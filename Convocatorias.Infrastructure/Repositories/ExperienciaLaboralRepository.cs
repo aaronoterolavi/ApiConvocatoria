@@ -12,127 +12,134 @@ namespace Convocatorias.Infrastructure.Repositories
 
         public ExperienciaLaboralRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
+            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
         }
 
-        public async Task<int> InsertarAsync(ExperienciaLaboralDto dto)
+        public int Insertar(ExperienciaLaboralDto dto)
         {
-            using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand("sp_InsertarExperienciaLaboral", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("PA_InsertarExperienciaLaboral", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@iCodUsuario", dto.iCodUsuario);
+                cmd.Parameters.AddWithValue("@vEntidad", dto.vEntidad);
+                cmd.Parameters.AddWithValue("@vUnidadOrganica", (object?)dto.vUnidadOrganica ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@vCargo", dto.vCargo);
+                cmd.Parameters.AddWithValue("@cSector", (object?)dto.cSector ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@dFechaInicio", dto.dFechaInicio);
+                cmd.Parameters.AddWithValue("@dFechaFin", (object?)dto.dFechaFin ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@vFunciones", (object?)dto.vFunciones ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@iCodUsuarioRegistra", dto.iCodUsuarioRegistra);
 
-            cmd.Parameters.AddWithValue("@iCodPostulante", dto.iCodPostulante);
-            cmd.Parameters.AddWithValue("@vEntidad", dto.vEntidad ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@vUnidadOrganica", dto.vUnidadOrganica ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@vCargo", dto.vCargo ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@cSector", dto.cSector ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@dFechaInicio", dto.dFechaInicio);
-            cmd.Parameters.AddWithValue("@dFechaFin", dto.dFechaFin ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@vFunciones", dto.vFunciones ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@iCodUsuarioRegistra", dto.iCodUsuarioRegistra);
-
-            await conn.OpenAsync();
-            var result = await cmd.ExecuteScalarAsync();
-            return Convert.ToInt32(result);
+                conn.Open();
+                var result = cmd.ExecuteScalar();
+                return Convert.ToInt32(result);
+            }
         }
 
-        public async Task<List<ExperienciaLaboralDto>> ListarAsync()
+        public void Actualizar(ExperienciaLaboralDto dto)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("PA_ActualizarExperienciaLaboral", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@iCodExperienciaLaboral", dto.iCodExperienciaLaboral);
+                cmd.Parameters.AddWithValue("@iCodUsuario", dto.iCodUsuario);
+                cmd.Parameters.AddWithValue("@vEntidad", dto.vEntidad);
+                cmd.Parameters.AddWithValue("@vUnidadOrganica", (object?)dto.vUnidadOrganica ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@vCargo", dto.vCargo);
+                cmd.Parameters.AddWithValue("@cSector", (object?)dto.cSector ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@dFechaInicio", dto.dFechaInicio);
+                cmd.Parameters.AddWithValue("@dFechaFin", (object?)dto.dFechaFin ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@vFunciones", (object?)dto.vFunciones ?? DBNull.Value);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void Eliminar(int id)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("PA_EliminarExperienciaLaboral", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@iCodExperienciaLaboral", id);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public List<ExperienciaLaboralDto> Listar()
         {
             var lista = new List<ExperienciaLaboralDto>();
 
-            using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand("sp_ListarExperienciaLaboral", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            await conn.OpenAsync();
-            using var reader = await cmd.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("PA_ListarExperienciaLaboral", conn))
             {
-                lista.Add(new ExperienciaLaboralDto
-                {
-                    iCodExperienciaLaboral = reader.GetInt32(reader.GetOrdinal("iCodExperienciaLaboral")),
-                    iCodPostulante = reader.GetInt32(reader.GetOrdinal("iCodPostulante")),
-                    vEntidad = reader["vEntidad"].ToString(),
-                    vUnidadOrganica = reader["vUnidadOrganica"].ToString(),
-                    vCargo = reader["vCargo"].ToString(),
-                    cSector = reader["cSector"].ToString(),
-                    dFechaInicio = reader.GetDateTime(reader.GetOrdinal("dFechaInicio")),
-                    dFechaFin = reader["dFechaFin"] == DBNull.Value ? null : reader.GetDateTime(reader.GetOrdinal("dFechaFin")),
-                    vFunciones = reader["vFunciones"].ToString(),
-                    iCodUsuarioRegistra = reader.GetInt32(reader.GetOrdinal("iCodUsuarioRegistra")),
-                    dtFechaRegistro = reader.GetDateTime(reader.GetOrdinal("dtFechaRegistro")),
-                    bActivo = reader.GetBoolean(reader.GetOrdinal("bActivo"))
-                });
-            }
+                cmd.CommandType = CommandType.StoredProcedure;
+                conn.Open();
 
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        lista.Add(new ExperienciaLaboralDto
+                        {
+                            iCodExperienciaLaboral = Convert.ToInt32(dr["iCodExperienciaLaboral"]),
+                            iCodUsuario = Convert.ToInt32(dr["iCodUsuario"]),
+                            vEntidad = dr["vEntidad"].ToString()!,
+                            vUnidadOrganica = dr["vUnidadOrganica"].ToString(),
+                            vCargo = dr["vCargo"].ToString()!,
+                            cSector = dr["cSector"].ToString(),
+                            dFechaInicio = Convert.ToDateTime(dr["dFechaInicio"]),
+                            dFechaFin = dr["dFechaFin"] == DBNull.Value ? null : Convert.ToDateTime(dr["dFechaFin"]),
+                            vFunciones = dr["vFunciones"].ToString(),
+                            iCodUsuarioRegistra = Convert.ToInt32(dr["iCodUsuarioRegistra"]),
+                            dtFechaRegistro = Convert.ToDateTime(dr["dtFechaRegistro"]),
+                            bActivo = Convert.ToBoolean(dr["bActivo"])
+                        });
+                    }
+                }
+            }
             return lista;
         }
 
-        public async Task<ExperienciaLaboralDto?> ObtenerPorIdAsync(int id)
+        public List<ExperienciaLaboralDto> ListarPorUsuario(int iCodUsuario)
         {
-            using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand("sp_ObtenerExperienciaLaboralPorId", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@iCodExperienciaLaboral", id);
+            var lista = new List<ExperienciaLaboralDto>();
 
-            await conn.OpenAsync();
-            using var reader = await cmd.ExecuteReaderAsync();
-
-            if (await reader.ReadAsync())
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("PA_ListarExperienciaLaboralPorUsuario", conn))
             {
-                return new ExperienciaLaboralDto
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@iCodUsuario", iCodUsuario);
+
+                conn.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader())
                 {
-                    iCodExperienciaLaboral = reader.GetInt32(reader.GetOrdinal("iCodExperienciaLaboral")),
-                    iCodPostulante = reader.GetInt32(reader.GetOrdinal("iCodPostulante")),
-                    vEntidad = reader["vEntidad"].ToString(),
-                    vUnidadOrganica = reader["vUnidadOrganica"].ToString(),
-                    vCargo = reader["vCargo"].ToString(),
-                    cSector = reader["cSector"].ToString(),
-                    dFechaInicio = reader.GetDateTime(reader.GetOrdinal("dFechaInicio")),
-                    dFechaFin = reader["dFechaFin"] == DBNull.Value ? null : reader.GetDateTime(reader.GetOrdinal("dFechaFin")),
-                    vFunciones = reader["vFunciones"].ToString(),
-                    iCodUsuarioRegistra = reader.GetInt32(reader.GetOrdinal("iCodUsuarioRegistra")),
-                    dtFechaRegistro = reader.GetDateTime(reader.GetOrdinal("dtFechaRegistro")),
-                    bActivo = reader.GetBoolean(reader.GetOrdinal("bActivo"))
-                };
+                    while (dr.Read())
+                    {
+                        lista.Add(new ExperienciaLaboralDto
+                        {
+                            iCodExperienciaLaboral = Convert.ToInt32(dr["iCodExperienciaLaboral"]),
+                            iCodUsuario = Convert.ToInt32(dr["iCodUsuario"]),
+                            vEntidad = dr["vEntidad"].ToString()!,
+                            vUnidadOrganica = dr["vUnidadOrganica"].ToString(),
+                            vCargo = dr["vCargo"].ToString()!,
+                            cSector = dr["cSector"].ToString(),
+                            dFechaInicio = Convert.ToDateTime(dr["dFechaInicio"]),
+                            dFechaFin = dr["dFechaFin"] == DBNull.Value ? null : Convert.ToDateTime(dr["dFechaFin"]),
+                            vFunciones = dr["vFunciones"].ToString(),
+                            iCodUsuarioRegistra = Convert.ToInt32(dr["iCodUsuarioRegistra"]),
+                            dtFechaRegistro = Convert.ToDateTime(dr["dtFechaRegistro"]),
+                            bActivo = Convert.ToBoolean(dr["bActivo"])
+                        });
+                    }
+                }
             }
-
-            return null;
-        }
-
-        public async Task<string> ActualizarAsync(ExperienciaLaboralDto dto)
-        {
-            using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand("sp_ActualizarExperienciaLaboral", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            cmd.Parameters.AddWithValue("@iCodExperienciaLaboral", dto.iCodExperienciaLaboral);
-            cmd.Parameters.AddWithValue("@iCodPostulante", dto.iCodPostulante);
-            cmd.Parameters.AddWithValue("@vEntidad", dto.vEntidad ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@vUnidadOrganica", dto.vUnidadOrganica ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@vCargo", dto.vCargo ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@cSector", dto.cSector ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@dFechaInicio", dto.dFechaInicio);
-            cmd.Parameters.AddWithValue("@dFechaFin", dto.dFechaFin ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@vFunciones", dto.vFunciones ?? (object)DBNull.Value);
-            cmd.Parameters.AddWithValue("@iCodUsuarioRegistra", dto.iCodUsuarioRegistra);
-
-            await conn.OpenAsync();
-            var result = await cmd.ExecuteScalarAsync();
-            return result?.ToString() ?? "Actualizado correctamente";
-        }
-
-        public async Task<string> EliminarAsync(int id)
-        {
-            using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand("sp_EliminarExperienciaLaboral", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@iCodExperienciaLaboral", id);
-
-            await conn.OpenAsync();
-            var result = await cmd.ExecuteScalarAsync();
-            return result?.ToString() ?? "Eliminado correctamente";
+            return lista;
         }
     }
 }

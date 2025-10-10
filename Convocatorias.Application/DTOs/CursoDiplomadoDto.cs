@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Convocatorias.Application.DTOs
 {
-    public class CursoDiplomadoDto
+    public class CursoDiplomadoDTO
     {
         public int iCodCursoDiplomado { get; set; }
-        public int iCodPostulante { get; set; }
+        public int iCodUsuario { get; set; }
         public string vCurso { get; set; }
         public string vNombreInstitucion { get; set; }
         public int iHoras { get; set; }

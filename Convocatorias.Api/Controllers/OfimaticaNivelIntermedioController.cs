@@ -15,60 +15,32 @@ namespace Convocatorias.Api.Controllers
             _service = service;
         }
 
-        [HttpPost("insert")]
-        public IActionResult Insert([FromBody] OfimaticaNivelIntermedioDTO dto)
+        [HttpPost("insertar")]
+        public IActionResult Insertar([FromBody] OfimaticaNivelIntermedioDTO dto)
         {
-            try
-            {
-                int id = _service.Insert(dto);
-                return Ok(new { success = true, iCodOfimaticaNivelIntermedio = id });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
+            var mensaje = _service.Insertar(dto);
+            return Ok(new { mensaje });
         }
 
-        [HttpPut("update/{id}")]
-        public IActionResult Update(int id, [FromBody] bool bTieneConocimiento)
+        [HttpPut("actualizar")]
+        public IActionResult Actualizar([FromBody] OfimaticaNivelIntermedioDTO dto)
         {
-            try
-            {
-                _service.Update(id, bTieneConocimiento);
-                return Ok(new { success = true });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
+            var mensaje = _service.Actualizar(dto);
+            return Ok(new { mensaje });
         }
 
-        [HttpDelete("delete/{id}")]
-        public IActionResult Delete(int id)
+        [HttpDelete("eliminar/{id}")]
+        public IActionResult Eliminar(int id)
         {
-            try
-            {
-                _service.Delete(id);
-                return Ok(new { success = true });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
+            var mensaje = _service.Eliminar(id);
+            return Ok(new { mensaje });
         }
 
-        [HttpGet("getById/{id}")]
-        public IActionResult GetById(int id)
+        [HttpGet("listar")]
+        public IActionResult Listar([FromQuery] int? iCodUsuario = null)
         {
-            var result = _service.GetById(id);
-            return result != null ? Ok(result) : NotFound();
-        }
-
-        [HttpGet("getByPostulante/{iCodPostulante}")]
-        public IActionResult GetByPostulante(int iCodPostulante)
-        {
-            var result = _service.GetByPostulante(iCodPostulante);
-            return result != null ? Ok(result) : NotFound();
+            var (lista, mensaje) = _service.Listar(iCodUsuario);
+            return Ok(new { mensaje, lista });
         }
     }
 }

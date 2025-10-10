@@ -9,10 +9,10 @@ namespace Convocatorias.Application.Interfaces
 {
     public interface IExperienciaLaboralRepository
     {
-        Task<int> InsertarAsync(ExperienciaLaboralDto dto);
-        Task<List<ExperienciaLaboralDto>> ListarAsync();
-        Task<ExperienciaLaboralDto?> ObtenerPorIdAsync(int id);
-        Task<string> ActualizarAsync(ExperienciaLaboralDto dto);
-        Task<string> EliminarAsync(int id);
+        int Insertar(ExperienciaLaboralDto dto);
+        void Actualizar(ExperienciaLaboralDto dto);
+        void Eliminar(int id);
+        List<ExperienciaLaboralDto> Listar();
+        List<ExperienciaLaboralDto> ListarPorUsuario(int iCodUsuario);
     }
 }

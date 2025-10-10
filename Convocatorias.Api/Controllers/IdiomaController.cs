@@ -15,63 +15,32 @@ namespace Convocatorias.Api.Controllers
             _service = service;
         }
 
-        [HttpPost("insert")]
-        public IActionResult Insert([FromBody] IdiomaDTO dto)
+        [HttpPost("insertar")]
+        public async Task<IActionResult> Insertar([FromBody] IdiomaDTO dto)
         {
-            try
-            {
-                var id = _service.Insert(dto);
-                return Ok(new { Message = "Idioma registrado correctamente.", iCodIdioma = id });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
+            var mensaje = await _service.InsertarAsync(dto);
+            return Ok(new { mensaje });
         }
 
-        [HttpPut("update")]
-        public IActionResult Update([FromBody] IdiomaDTO dto)
+        [HttpGet("listar/{iCodUsuario}")]
+        public async Task<IActionResult> Listar(int iCodUsuario)
         {
-            try
-            {
-                _service.Update(dto);
-                return Ok(new { Message = "Idioma actualizado correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
-        }
-
-        [HttpDelete("delete/{id}")]
-        public IActionResult Delete(int id)
-        {
-            try
-            {
-                _service.Delete(id);
-                return Ok(new { Message = "Idioma eliminado correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
-        }
-
-        [HttpGet("getbyid/{id}")]
-        public IActionResult GetById(int id)
-        {
-            var result = _service.GetById(id);
-            if (result == null)
-                return NotFound(new { Message = "Idioma no encontrado." });
-
+            var result = await _service.ListarAsync(iCodUsuario);
             return Ok(result);
         }
 
-        [HttpGet("getbypostulante/{idPostulante}")]
-        public IActionResult GetByPostulante(int idPostulante)
+        [HttpPut("actualizar")]
+        public async Task<IActionResult> Actualizar([FromBody] IdiomaDTO dto)
         {
-            var result = _service.GetByPostulante(idPostulante);
-            return Ok(result);
+            var mensaje = await _service.ActualizarAsync(dto);
+            return Ok(new { mensaje });
+        }
+
+        [HttpDelete("eliminar/{iCodIdioma}")]
+        public async Task<IActionResult> Eliminar(int iCodIdioma)
+        {
+            var mensaje = await _service.EliminarAsync(iCodIdioma);
+            return Ok(new { mensaje });
         }
     }
 }

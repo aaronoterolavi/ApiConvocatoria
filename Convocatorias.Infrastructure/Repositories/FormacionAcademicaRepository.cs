@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Convocatorias.Application.DTOs;
 using Convocatorias.Application.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -17,109 +12,120 @@ namespace Convocatorias.Infrastructure.Repositories
 
         public FormacionAcademicaRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection")
-                ?? throw new ArgumentNullException("Connection string 'DefaultConnection' not found.");
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public async Task<int> InsertarAsync(FormacionAcademicaDto dto)
+        public async Task<IEnumerable<FormacionAcademicaDTO>> ListarAsync()
         {
+            var lista = new List<FormacionAcademicaDTO>();
+
             using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand("sp_InsertarFormacionAcademica", connection);
-            command.CommandType = CommandType.StoredProcedure;
-
-            command.Parameters.AddWithValue("@iCodPostulante", dto.iCodPostulante);
-            command.Parameters.AddWithValue("@iCodNivelAcademico", dto.iCodNivelAcademico);
-            command.Parameters.AddWithValue("@vInstitucion", dto.vInstitucion);
-            command.Parameters.AddWithValue("@vProfesion", dto.vProfesion);
-            command.Parameters.AddWithValue("@dFechaEgreso", dto.dFechaEgreso);
-            command.Parameters.AddWithValue("@bActivo", dto.bActivo);
-
-            await connection.OpenAsync();
-            var result = await command.ExecuteScalarAsync();
-            return Convert.ToInt32(result);
-        }
-
-        public async Task<IEnumerable<FormacionAcademicaDto>> ListarAsync()
-        {
-            var lista = new List<FormacionAcademicaDto>();
-            using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand("sp_ListarFormacionAcademica", connection);
-            command.CommandType = CommandType.StoredProcedure;
+            using var command = new SqlCommand("PA_ListarFormacionAcademica", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
 
             await connection.OpenAsync();
             using var reader = await command.ExecuteReaderAsync();
+
             while (await reader.ReadAsync())
             {
-                lista.Add(new FormacionAcademicaDto
-                {
-                    iCodFormacionAcademica = reader.GetInt32(0),
-                    iCodPostulante = reader.GetInt32(1),
-                    iCodNivelAcademico = reader.GetInt32(2),
-                    vInstitucion = reader.GetString(3),
-                    vProfesion = reader.GetString(4),
-                    dFechaEgreso = reader.GetDateTime(5),
-                    dtFechaRegistro = reader.GetDateTime(6),
-                    bActivo = reader.GetBoolean(7)
-                });
+                lista.Add(Map(reader));
             }
 
             return lista;
         }
 
-        public async Task<FormacionAcademicaDto?> ObtenerPorIdAsync(int id)
+        public async Task<IEnumerable<FormacionAcademicaDTO>> ListarPorUsuarioAsync(int iCodUsuario)
         {
+            var lista = new List<FormacionAcademicaDTO>();
+
             using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand("sp_ObtenerFormacionAcademicaPorId", connection);
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@iCodFormacionAcademica", id);
+            using var command = new SqlCommand("PA_ListarFormacionAcademicaPorUsuario", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            command.Parameters.AddWithValue("@iCodUsuario", iCodUsuario);
 
             await connection.OpenAsync();
             using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
+
+            while (await reader.ReadAsync())
             {
-                return new FormacionAcademicaDto
-                {
-                    iCodFormacionAcademica = reader.GetInt32(0),
-                    iCodPostulante = reader.GetInt32(1),
-                    iCodNivelAcademico = reader.GetInt32(2),
-                    vInstitucion = reader.GetString(3),
-                    vProfesion = reader.GetString(4),
-                    dFechaEgreso = reader.GetDateTime(5),
-                    dtFechaRegistro = reader.GetDateTime(6),
-                    bActivo = reader.GetBoolean(7)
-                };
+                lista.Add(Map(reader));
             }
-            return null;
+
+            return lista;
         }
 
-        public async Task<string> ActualizarAsync(FormacionAcademicaDto dto)
+        public async Task<int> InsertarAsync(FormacionAcademicaDTO dto)
         {
             using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand("sp_ActualizarFormacionAcademica", connection);
-            command.CommandType = CommandType.StoredProcedure;
+            using var command = new SqlCommand("PA_InsertarFormacionAcademica", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
 
-            command.Parameters.AddWithValue("@iCodFormacionAcademica", dto.iCodFormacionAcademica);
-            command.Parameters.AddWithValue("@iCodPostulante", dto.iCodPostulante);
+            command.Parameters.AddWithValue("@iCodUsuario", dto.iCodUsuario);
             command.Parameters.AddWithValue("@iCodNivelAcademico", dto.iCodNivelAcademico);
-            command.Parameters.AddWithValue("@vInstitucion", dto.vInstitucion);
-            command.Parameters.AddWithValue("@vProfesion", dto.vProfesion);
+            command.Parameters.AddWithValue("@vInstitucion", dto.vInstitucion ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@vProfesion", dto.vProfesion ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@dFechaEgreso", dto.dFechaEgreso);
 
             await connection.OpenAsync();
+
             var result = await command.ExecuteScalarAsync();
-            return result?.ToString() ?? "Registro actualizado correctamente.";
+            return Convert.ToInt32(result);
         }
 
-        public async Task<string> EliminarAsync(int id)
+        public async Task ActualizarAsync(FormacionAcademicaDTO dto)
         {
             using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand("sp_EliminarFormacionAcademica", connection);
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@iCodFormacionAcademica", id);
+            using var command = new SqlCommand("PA_ActualizarFormacionAcademica", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            command.Parameters.AddWithValue("@iCodFormacionAcademica", dto.iCodFormacionAcademica);
+            command.Parameters.AddWithValue("@iCodUsuario", dto.iCodUsuario);
+            command.Parameters.AddWithValue("@iCodNivelAcademico", dto.iCodNivelAcademico);
+            command.Parameters.AddWithValue("@vInstitucion", dto.vInstitucion ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@vProfesion", dto.vProfesion ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@dFechaEgreso", dto.dFechaEgreso);
+            command.Parameters.AddWithValue("@bActivo", dto.bActivo);
 
             await connection.OpenAsync();
-            var result = await command.ExecuteScalarAsync();
-            return result?.ToString() ?? "Registro eliminado.";
+            await command.ExecuteNonQueryAsync();
+        }
+
+        public async Task EliminarAsync(int iCodFormacionAcademica)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand("PA_EliminarFormacionAcademica", connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            command.Parameters.AddWithValue("@iCodFormacionAcademica", iCodFormacionAcademica);
+
+            await connection.OpenAsync();
+            await command.ExecuteNonQueryAsync();
+        }
+
+        private FormacionAcademicaDTO Map(SqlDataReader reader)
+        {
+            return new FormacionAcademicaDTO
+            {
+                iCodFormacionAcademica = reader.GetInt32(reader.GetOrdinal("iCodFormacionAcademica")),
+                iCodUsuario = reader.GetInt32(reader.GetOrdinal("iCodUsuario")),
+                iCodNivelAcademico = reader.GetInt32(reader.GetOrdinal("iCodNivelAcademico")),
+                vInstitucion = reader["vInstitucion"].ToString(),
+                vProfesion = reader["vProfesion"].ToString(),
+                dFechaEgreso = reader.GetDateTime(reader.GetOrdinal("dFechaEgreso")),
+                dtFechaRegistro = reader.GetDateTime(reader.GetOrdinal("dtFechaRegistro")),
+                bActivo = reader.GetBoolean(reader.GetOrdinal("bActivo"))
+            };
         }
     }
 }

@@ -1,7 +1,6 @@
-﻿using Convocatorias.Application.DTOs;
+﻿using Microsoft.AspNetCore.Mvc;
+using Convocatorias.Application.DTOs;
 using Convocatorias.Application.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Convocatorias.Api.Controllers
 {
@@ -23,35 +22,32 @@ namespace Convocatorias.Api.Controllers
             return Ok(lista);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> ObtenerPorId(int id)
+        [HttpGet("usuario/{iCodUsuario}")]
+        public async Task<IActionResult> ListarPorUsuario(int iCodUsuario)
         {
-            var item = await _service.ObtenerPorIdAsync(id);
-            if (item == null)
-                return NotFound("No se encontró la formación académica especificada.");
-            return Ok(item);
+            var lista = await _service.ListarPorUsuarioAsync(iCodUsuario);
+            return Ok(lista);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Insertar([FromBody] FormacionAcademicaDto dto)
+        public async Task<IActionResult> Insertar([FromBody] FormacionAcademicaDTO dto)
         {
             var id = await _service.InsertarAsync(dto);
-            return Ok(new { iCodFormacionAcademica = id });
+            return Ok(new { mensaje = "Registro insertado correctamente.", iCodFormacionAcademica = id });
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Actualizar(int id, [FromBody] FormacionAcademicaDto dto)
+        [HttpPut]
+        public async Task<IActionResult> Actualizar([FromBody] FormacionAcademicaDTO dto)
         {
-            dto.iCodFormacionAcademica = id;
-            var mensaje = await _service.ActualizarAsync(dto);
-            return Ok(new { mensaje });
+            await _service.ActualizarAsync(dto);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Eliminar(int id)
+        [HttpDelete("{iCodFormacionAcademica}")]
+        public async Task<IActionResult> Eliminar(int iCodFormacionAcademica)
         {
-            var mensaje = await _service.EliminarAsync(id);
-            return Ok(new { mensaje });
+            await _service.EliminarAsync(iCodFormacionAcademica);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

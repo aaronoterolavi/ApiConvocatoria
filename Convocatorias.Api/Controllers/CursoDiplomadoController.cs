@@ -15,40 +15,32 @@ namespace Convocatorias.Api.Controllers
             _service = service;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Insertar([FromBody] CursoDiplomadoDto dto)
+        [HttpPost("insertar")]
+        public async Task<IActionResult> Insertar([FromBody] CursoDiplomadoDTO dto)
         {
-            var id = await _service.InsertAsync(dto);
-            return Ok(new { iCodCursoDiplomado = id });
+            await _service.InsertarAsync(dto);
+            return Ok("Curso diplomado registrado correctamente.");
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Actualizar(int id, [FromBody] CursoDiplomadoDto dto)
+        [HttpGet("listar/{iCodUsuario}")]
+        public async Task<IActionResult> Listar(int iCodUsuario)
         {
-            dto.iCodCursoDiplomado = id;
-            var mensaje = await _service.UpdateAsync(dto);
-            return Ok(new { mensaje });
+            var result = await _service.ListarAsync(iCodUsuario);
+            return Ok(result);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Eliminar(int id)
+        [HttpPut("actualizar")]
+        public async Task<IActionResult> Actualizar([FromBody] CursoDiplomadoDTO dto)
         {
-            var mensaje = await _service.DeleteAsync(id);
-            return Ok(new { mensaje });
+            await _service.ActualizarAsync(dto);
+            return Ok("Curso diplomado actualizado correctamente.");
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> ObtenerPorId(int id)
+        [HttpDelete("eliminar/{iCodCursoDiplomado}")]
+        public async Task<IActionResult> Eliminar(int iCodCursoDiplomado)
         {
-            var result = await _service.GetByIdAsync(id);
-            return result == null ? NotFound() : Ok(result);
-        }
-
-        [HttpGet("postulante/{iCodPostulante}")]
-        public async Task<IActionResult> ListarPorPostulante(int iCodPostulante)
-        {
-            var lista = await _service.GetByPostulanteAsync(iCodPostulante);
-            return Ok(lista);
+            await _service.EliminarAsync(iCodCursoDiplomado);
+            return Ok("Curso diplomado eliminado correctamente.");
         }
     }
 }

@@ -15,108 +15,132 @@ namespace Convocatorias.Infrastructure.Repositories
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public int Insert(IdiomaDTO dto)
+        public async Task<string> InsertarAsync(IdiomaDTO entidad)
         {
-            using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand("USP_Idioma_Insert", connection);
-            command.CommandType = CommandType.StoredProcedure;
+            string mensaje = string.Empty;
 
-            command.Parameters.AddWithValue("@iCodPostulante", dto.iCodPostulante);
-            command.Parameters.AddWithValue("@vIdioma", dto.vIdioma);
-            command.Parameters.AddWithValue("@vInstitucion", dto.vInstitucion);
-            command.Parameters.AddWithValue("@vNivelAlcanzado", dto.vNivelAlcanzado);
-            command.Parameters.AddWithValue("@iCodUsuarioRegistra", dto.iCodUsuarioRegistra);
-
-            connection.Open();
-            var result = command.ExecuteScalar();
-            return Convert.ToInt32(result);
-        }
-
-        public void Update(IdiomaDTO dto)
-        {
-            using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand("USP_Idioma_Update", connection);
-            command.CommandType = CommandType.StoredProcedure;
-
-            command.Parameters.AddWithValue("@iCodIdioma", dto.iCodIdioma);
-            command.Parameters.AddWithValue("@vIdioma", dto.vIdioma);
-            command.Parameters.AddWithValue("@vInstitucion", dto.vInstitucion);
-            command.Parameters.AddWithValue("@vNivelAlcanzado", dto.vNivelAlcanzado);
-
-            connection.Open();
-            command.ExecuteNonQuery();
-        }
-
-        public void Delete(int iCodIdioma)
-        {
-            using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand("USP_Idioma_Delete", connection);
-            command.CommandType = CommandType.StoredProcedure;
-
-            command.Parameters.AddWithValue("@iCodIdioma", iCodIdioma);
-
-            connection.Open();
-            command.ExecuteNonQuery();
-        }
-
-        public IdiomaDTO? GetById(int iCodIdioma)
-        {
-            using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand("USP_Idioma_GetById", connection);
-            command.CommandType = CommandType.StoredProcedure;
-
-            command.Parameters.AddWithValue("@iCodIdioma", iCodIdioma);
-
-            connection.Open();
-            using var reader = command.ExecuteReader();
-
-            if (reader.Read())
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("PA_Idioma_Insertar", conn))
             {
-                return new IdiomaDTO
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@iCodUsuario", entidad.iCodUsuario);
+                cmd.Parameters.AddWithValue("@vIdioma", entidad.vIdioma);
+                cmd.Parameters.AddWithValue("@vInstitucion", entidad.vInstitucion);
+                cmd.Parameters.AddWithValue("@vNivelAlcanzado", entidad.vNivelAlcanzado);
+                cmd.Parameters.AddWithValue("@iCodUsuarioRegistra", entidad.iCodUsuarioRegistra);
+
+                SqlParameter pMensaje = new SqlParameter("@Mensaje", SqlDbType.VarChar, 200)
                 {
-                    iCodIdioma = Convert.ToInt32(reader["iCodIdioma"]),
-                    iCodPostulante = Convert.ToInt32(reader["iCodPostulante"]),
-                    vIdioma = reader["vIdioma"].ToString()!,
-                    vInstitucion = reader["vInstitucion"].ToString()!,
-                    vNivelAlcanzado = reader["vNivelAlcanzado"].ToString()!,
-                    dtFechaRegistro = Convert.ToDateTime(reader["dtFechaRegistro"]),
-                    iCodUsuarioRegistra = Convert.ToInt32(reader["iCodUsuarioRegistra"]),
-                    bActivo = Convert.ToBoolean(reader["bActivo"])
+                    Direction = ParameterDirection.Output
                 };
+                cmd.Parameters.Add(pMensaje);
+
+                await conn.OpenAsync();
+                await cmd.ExecuteNonQueryAsync();
+
+                mensaje = pMensaje.Value.ToString();
             }
 
-            return null;
+            return mensaje;
         }
 
-        public List<IdiomaDTO> GetByPostulante(int iCodPostulante)
+        public async Task<IEnumerable<IdiomaDTO>> ListarAsync(int iCodUsuario)
         {
-            var list = new List<IdiomaDTO>();
+            var lista = new List<IdiomaDTO>();
+            string mensaje = string.Empty;
 
-            using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand("USP_Idioma_GetByPostulante", connection);
-            command.CommandType = CommandType.StoredProcedure;
-
-            command.Parameters.AddWithValue("@iCodPostulante", iCodPostulante);
-
-            connection.Open();
-            using var reader = command.ExecuteReader();
-
-            while (reader.Read())
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("PA_Idioma_Listar", conn))
             {
-                list.Add(new IdiomaDTO
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@iCodUsuario", iCodUsuario);
+
+                SqlParameter pMensaje = new SqlParameter("@Mensaje", SqlDbType.VarChar, 200)
                 {
-                    iCodIdioma = Convert.ToInt32(reader["iCodIdioma"]),
-                    iCodPostulante = Convert.ToInt32(reader["iCodPostulante"]),
-                    vIdioma = reader["vIdioma"].ToString()!,
-                    vInstitucion = reader["vInstitucion"].ToString()!,
-                    vNivelAlcanzado = reader["vNivelAlcanzado"].ToString()!,
-                    dtFechaRegistro = Convert.ToDateTime(reader["dtFechaRegistro"]),
-                    iCodUsuarioRegistra = Convert.ToInt32(reader["iCodUsuarioRegistra"]),
-                    bActivo = Convert.ToBoolean(reader["bActivo"])
-                });
+                    Direction = ParameterDirection.Output
+                };
+                cmd.Parameters.Add(pMensaje);
+
+                await conn.OpenAsync();
+
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        lista.Add(new IdiomaDTO
+                        {
+                            iCodIdioma = reader.GetInt32(reader.GetOrdinal("iCodIdioma")),
+                            iCodUsuario = reader.GetInt32(reader.GetOrdinal("iCodUsuario")),
+                            vIdioma = reader.GetString(reader.GetOrdinal("vIdioma")),
+                            vInstitucion = reader.GetString(reader.GetOrdinal("vInstitucion")),
+                            vNivelAlcanzado = reader.GetString(reader.GetOrdinal("vNivelAlcanzado")),
+                            dtFechaRegistro = reader.GetDateTime(reader.GetOrdinal("dtFechaRegistro")),
+                            iCodUsuarioRegistra = reader.GetInt32(reader.GetOrdinal("iCodUsuarioRegistra")),
+                            bActivo = reader.GetBoolean(reader.GetOrdinal("bActivo"))
+                        });
+                    }
+                }
+
+                mensaje = pMensaje.Value?.ToString() ?? string.Empty;
             }
 
-            return list;
+            return lista;
+        }
+
+        public async Task<string> ActualizarAsync(IdiomaDTO entidad)
+        {
+            string mensaje = string.Empty;
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("PA_Idioma_Actualizar", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@iCodIdioma", entidad.iCodIdioma);
+                cmd.Parameters.AddWithValue("@vIdioma", entidad.vIdioma);
+                cmd.Parameters.AddWithValue("@vInstitucion", entidad.vInstitucion);
+                cmd.Parameters.AddWithValue("@vNivelAlcanzado", entidad.vNivelAlcanzado);
+
+                SqlParameter pMensaje = new SqlParameter("@Mensaje", SqlDbType.VarChar, 200)
+                {
+                    Direction = ParameterDirection.Output
+                };
+                cmd.Parameters.Add(pMensaje);
+
+                await conn.OpenAsync();
+                await cmd.ExecuteNonQueryAsync();
+
+                mensaje = pMensaje.Value.ToString();
+            }
+
+            return mensaje;
+        }
+
+        public async Task<string> EliminarAsync(int iCodIdioma)
+        {
+            string mensaje = string.Empty;
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("PA_Idioma_Eliminar", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@iCodIdioma", iCodIdioma);
+
+                SqlParameter pMensaje = new SqlParameter("@Mensaje", SqlDbType.VarChar, 200)
+                {
+                    Direction = ParameterDirection.Output
+                };
+                cmd.Parameters.Add(pMensaje);
+
+                await conn.OpenAsync();
+                await cmd.ExecuteNonQueryAsync();
+
+                mensaje = pMensaje.Value.ToString();
+            }
+
+            return mensaje;
         }
     }
 }

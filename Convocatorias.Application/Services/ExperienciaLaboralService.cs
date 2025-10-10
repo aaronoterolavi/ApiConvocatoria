@@ -5,17 +5,17 @@ namespace Convocatorias.Application.Services
 {
     public class ExperienciaLaboralService
     {
-        private readonly IExperienciaLaboralRepository _repo;
+        private readonly IExperienciaLaboralRepository _repository;
 
-        public ExperienciaLaboralService(IExperienciaLaboralRepository repo)
+        public ExperienciaLaboralService(IExperienciaLaboralRepository repository)
         {
-            _repo = repo;
+            _repository = repository;
         }
 
-        public Task<int> InsertarAsync(ExperienciaLaboralDto dto) => _repo.InsertarAsync(dto);
-        public Task<List<ExperienciaLaboralDto>> ListarAsync() => _repo.ListarAsync();
-        public Task<ExperienciaLaboralDto?> ObtenerPorIdAsync(int id) => _repo.ObtenerPorIdAsync(id);
-        public Task<string> ActualizarAsync(ExperienciaLaboralDto dto) => _repo.ActualizarAsync(dto);
-        public Task<string> EliminarAsync(int id) => _repo.EliminarAsync(id);
+        public int Insertar(ExperienciaLaboralDto dto) => _repository.Insertar(dto);
+        public void Actualizar(ExperienciaLaboralDto dto) => _repository.Actualizar(dto);
+        public void Eliminar(int id) => _repository.Eliminar(id);
+        public List<ExperienciaLaboralDto> Listar() => _repository.Listar();
+        public List<ExperienciaLaboralDto> ListarPorUsuario(int iCodUsuario) => _repository.ListarPorUsuario(iCodUsuario);
     }
 }

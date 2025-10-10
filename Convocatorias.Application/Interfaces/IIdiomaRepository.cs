@@ -9,10 +9,9 @@ namespace Convocatorias.Application.Interfaces
 {
     public interface IIdiomaRepository
     {
-        int Insert(IdiomaDTO dto);
-        void Update(IdiomaDTO dto);
-        void Delete(int iCodIdioma);
-        IdiomaDTO? GetById(int iCodIdioma);
-        List<IdiomaDTO> GetByPostulante(int iCodPostulante);
+        Task<string> InsertarAsync(IdiomaDTO entidad);
+        Task<IEnumerable<IdiomaDTO>> ListarAsync(int iCodUsuario);
+        Task<string> ActualizarAsync(IdiomaDTO entidad);
+        Task<string> EliminarAsync(int iCodIdioma);
     }
 }

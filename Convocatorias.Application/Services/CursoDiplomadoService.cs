@@ -5,17 +5,16 @@ namespace Convocatorias.Application.Services
 {
     public class CursoDiplomadoService
     {
-        private readonly ICursoDiplomadoRepository _repository;
+        private readonly ICursoDiplomadoRepository _repo;
 
-        public CursoDiplomadoService(ICursoDiplomadoRepository repository)
+        public CursoDiplomadoService(ICursoDiplomadoRepository repo)
         {
-            _repository = repository;
+            _repo = repo;
         }
 
-        public Task<int> InsertAsync(CursoDiplomadoDto dto) => _repository.InsertAsync(dto);
-        public Task<string> UpdateAsync(CursoDiplomadoDto dto) => _repository.UpdateAsync(dto);
-        public Task<string> DeleteAsync(int id) => _repository.DeleteAsync(id);
-        public Task<CursoDiplomadoDto?> GetByIdAsync(int id) => _repository.GetByIdAsync(id);
-        public Task<List<CursoDiplomadoDto>> GetByPostulanteAsync(int iCodPostulante) => _repository.GetByPostulanteAsync(iCodPostulante);
+        public async Task InsertarAsync(CursoDiplomadoDTO dto) => await _repo.InsertarAsync(dto);
+        public async Task<IEnumerable<CursoDiplomadoDTO>> ListarAsync(int iCodUsuario) => await _repo.ListarAsync(iCodUsuario);
+        public async Task ActualizarAsync(CursoDiplomadoDTO dto) => await _repo.ActualizarAsync(dto);
+        public async Task EliminarAsync(int iCodCursoDiplomado) => await _repo.EliminarAsync(iCodCursoDiplomado);
     }
 }

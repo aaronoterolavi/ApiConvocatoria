@@ -16,36 +16,39 @@ namespace Convocatorias.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Listar() =>
-            Ok(await _service.ListarAsync());
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> ObtenerPorId(int id)
+        public IActionResult Listar()
         {
-            var result = await _service.ObtenerPorIdAsync(id);
-            return result == null ? NotFound() : Ok(result);
+            var data = _service.Listar();
+            return Ok(data);
+        }
+
+        [HttpGet("usuario/{iCodUsuario}")]
+        public IActionResult ListarPorUsuario(int iCodUsuario)
+        {
+            var data = _service.ListarPorUsuario(iCodUsuario);
+            return Ok(data);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Insertar([FromBody] ExperienciaLaboralDto dto)
+        public IActionResult Insertar([FromBody] ExperienciaLaboralDto dto)
         {
-            var id = await _service.InsertarAsync(dto);
+            var id = _service.Insertar(dto);
             return Ok(new { iCodExperienciaLaboral = id });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Actualizar(int id, [FromBody] ExperienciaLaboralDto dto)
+        public IActionResult Actualizar(int id, [FromBody] ExperienciaLaboralDto dto)
         {
             dto.iCodExperienciaLaboral = id;
-            var mensaje = await _service.ActualizarAsync(dto);
-            return Ok(new { mensaje });
+            _service.Actualizar(dto);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Eliminar(int id)
+        public IActionResult Eliminar(int id)
         {
-            var mensaje = await _service.EliminarAsync(id);
-            return Ok(new { mensaje });
+            _service.Eliminar(id);
+            return NoContent();
         }
     }
 }

@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Convocatorias.Application.DTOs
 {
-    public class FormacionAcademicaDto
+    public class FormacionAcademicaDTO
     {
         public int iCodFormacionAcademica { get; set; }
-        public int iCodPostulante { get; set; }
+        public int iCodUsuario { get; set; }
         public int iCodNivelAcademico { get; set; }
-        public string vInstitucion { get; set; } = string.Empty;
-        public string vProfesion { get; set; } = string.Empty;
+        public string vInstitucion { get; set; }
+        public string vProfesion { get; set; }
         public DateTime dFechaEgreso { get; set; }
         public DateTime dtFechaRegistro { get; set; }
         public bool bActivo { get; set; }

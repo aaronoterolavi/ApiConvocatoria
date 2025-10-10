@@ -16,41 +16,39 @@ namespace Convocatorias.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Listar()
+        public IActionResult Listar()
         {
-            var lista = await _service.ListarAsync();
+            var lista = _service.Listar();
             return Ok(lista);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> ObtenerPorId(int id)
+        [HttpGet("usuario/{iCodUsuario}")]
+        public IActionResult ListarPorUsuario(int iCodUsuario)
         {
-            var item = await _service.ObtenerPorIdAsync(id);
-            if (item == null)
-                return NotFound("No se encontró la colegiatura especificada.");
-            return Ok(item);
+            var lista = _service.ListarPorUsuario(iCodUsuario);
+            return Ok(lista);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Insertar([FromBody] ColegiaturaDto dto)
+        public IActionResult Insertar([FromBody] ColegiaturaDto dto)
         {
-            var id = await _service.InsertarAsync(dto);
+            var id = _service.Insertar(dto);
             return Ok(new { iCodColegiatura = id });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Actualizar(int id, [FromBody] ColegiaturaDto dto)
+        public IActionResult Actualizar(int id, [FromBody] ColegiaturaDto dto)
         {
             dto.iCodColegiatura = id;
-            var mensaje = await _service.ActualizarAsync(dto);
-            return Ok(new { mensaje });
+            _service.Actualizar(dto);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Eliminar(int id)
+        public IActionResult Eliminar(int id)
         {
-            var mensaje = await _service.EliminarAsync(id);
-            return Ok(new { mensaje });
+            _service.Eliminar(id);
+            return NoContent();
         }
     }
 }

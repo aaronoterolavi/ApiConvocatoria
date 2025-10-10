@@ -9,7 +9,7 @@ namespace Convocatorias.Application.DTOs
     public class OfimaticaNivelIntermedioDTO
     {
         public int iCodOfimaticaNivelIntermedio { get; set; }
-        public int iCodPostulante { get; set; }
+        public int iCodUsuario { get; set; }
         public bool bTieneConocimiento { get; set; }
         public DateTime dtFechaRegistro { get; set; }
         public int iCodUsuarioRegistra { get; set; }

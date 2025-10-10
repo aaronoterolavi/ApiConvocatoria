@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Convocatorias.Application.DTOs;
 using Convocatorias.Application.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -17,109 +12,117 @@ namespace Convocatorias.Infrastructure.Repositories
 
         public ColegiaturaRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection")
-                ?? throw new ArgumentNullException("Connection string 'DefaultConnection' not found.");
+            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
         }
 
-        public async Task<int> InsertarAsync(ColegiaturaDto dto)
+        public int Insertar(ColegiaturaDto dto)
         {
-            using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand("sp_InsertarColegiatura", connection);
-            command.CommandType = CommandType.StoredProcedure;
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("PA_InsertarColegiatura", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@iCodUsuario", dto.iCodUsuario);
+                cmd.Parameters.AddWithValue("@iCodColegioProfesional", dto.iCodColegioProfesional);
+                cmd.Parameters.AddWithValue("@vNroColegiatura", dto.vNroColegiatura);
+                cmd.Parameters.AddWithValue("@bHabilitado", dto.bHabilitado);
+                cmd.Parameters.AddWithValue("@iCodUsuarioRegistra", dto.iCodUsuarioRegistra);
+                cmd.Parameters.AddWithValue("@bActivo", dto.bActivo);
 
-            command.Parameters.AddWithValue("@iCodPostulante", dto.iCodPostulante);
-            command.Parameters.AddWithValue("@iCodColegioProfesional", dto.iCodColegioProfesional);
-            command.Parameters.AddWithValue("@vNroColegiatura", dto.vNroColegiatura);
-            command.Parameters.AddWithValue("@bHabilitado", dto.bHabilitado);
-            command.Parameters.AddWithValue("@iCodUsuarioRegistra", dto.iCodUsuarioRegistra);
-
-            await connection.OpenAsync();
-            var result = await command.ExecuteScalarAsync();
-            return Convert.ToInt32(result);
+                conn.Open();
+                var result = cmd.ExecuteScalar();
+                return Convert.ToInt32(result);
+            }
         }
 
-        public async Task<IEnumerable<ColegiaturaDto>> ListarAsync()
+        public void Actualizar(ColegiaturaDto dto)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("PA_ActualizarColegiatura", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@iCodColegiatura", dto.iCodColegiatura);
+                cmd.Parameters.AddWithValue("@iCodUsuario", dto.iCodUsuario);
+                cmd.Parameters.AddWithValue("@iCodColegioProfesional", dto.iCodColegioProfesional);
+                cmd.Parameters.AddWithValue("@vNroColegiatura", dto.vNroColegiatura);
+                cmd.Parameters.AddWithValue("@bHabilitado", dto.bHabilitado);
+                cmd.Parameters.AddWithValue("@bActivo", dto.bActivo);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void Eliminar(int iCodColegiatura)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("PA_EliminarColegiatura", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@iCodColegiatura", iCodColegiatura);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public List<ColegiaturaDto> Listar()
         {
             var lista = new List<ColegiaturaDto>();
-            using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand("sp_ListarColegiaturas", connection);
-            command.CommandType = CommandType.StoredProcedure;
-
-            await connection.OpenAsync();
-            using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("PA_ListarColegiatura", conn))
             {
-                lista.Add(new ColegiaturaDto
+                cmd.CommandType = CommandType.StoredProcedure;
+                conn.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader())
                 {
-                    iCodColegiatura = reader.GetInt32(0),
-                    iCodPostulante = reader.GetInt32(1),
-                    iCodColegioProfesional = reader.GetInt32(2),
-                    vNroColegiatura = reader.GetString(3),
-                    bHabilitado = reader.GetBoolean(4),
-                    iCodUsuarioRegistra = reader.GetInt32(5),
-                    dtFechaRegistro = reader.GetDateTime(6),
-                    bActivo = reader.GetBoolean(7)
-                });
+                    while (dr.Read())
+                    {
+                        lista.Add(new ColegiaturaDto
+                        {
+                            iCodColegiatura = Convert.ToInt32(dr["iCodColegiatura"]),
+                            iCodUsuario = Convert.ToInt32(dr["iCodUsuario"]),
+                            iCodColegioProfesional = Convert.ToInt32(dr["iCodColegioProfesional"]),
+                            vNroColegiatura = dr["vNroColegiatura"].ToString()!,
+                            bHabilitado = Convert.ToBoolean(dr["bHabilitado"]),
+                            iCodUsuarioRegistra = Convert.ToInt32(dr["iCodUsuarioRegistra"]),
+                            dtFechaRegistro = Convert.ToDateTime(dr["dtFechaRegistro"]),
+                            bActivo = Convert.ToBoolean(dr["bActivo"])
+                        });
+                    }
+                }
             }
-
             return lista;
         }
 
-        public async Task<ColegiaturaDto?> ObtenerPorIdAsync(int id)
+        public List<ColegiaturaDto> ListarPorUsuario(int iCodUsuario)
         {
-            using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand("sp_ObtenerColegiaturaPorId", connection);
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@iCodColegiatura", id);
-
-            await connection.OpenAsync();
-            using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
+            var lista = new List<ColegiaturaDto>();
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("PA_ListarColegiaturaPorUsuario", conn))
             {
-                return new ColegiaturaDto
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@iCodUsuario", iCodUsuario);
+
+                conn.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader())
                 {
-                    iCodColegiatura = reader.GetInt32(0),
-                    iCodPostulante = reader.GetInt32(1),
-                    iCodColegioProfesional = reader.GetInt32(2),
-                    vNroColegiatura = reader.GetString(3),
-                    bHabilitado = reader.GetBoolean(4),
-                    iCodUsuarioRegistra = reader.GetInt32(5),
-                    dtFechaRegistro = reader.GetDateTime(6),
-                    bActivo = reader.GetBoolean(7)
-                };
+                    while (dr.Read())
+                    {
+                        lista.Add(new ColegiaturaDto
+                        {
+                            iCodColegiatura = Convert.ToInt32(dr["iCodColegiatura"]),
+                            iCodUsuario = Convert.ToInt32(dr["iCodUsuario"]),
+                            iCodColegioProfesional = Convert.ToInt32(dr["iCodColegioProfesional"]),
+                            vNroColegiatura = dr["vNroColegiatura"].ToString()!,
+                            bHabilitado = Convert.ToBoolean(dr["bHabilitado"]),
+                            iCodUsuarioRegistra = Convert.ToInt32(dr["iCodUsuarioRegistra"]),
+                            dtFechaRegistro = Convert.ToDateTime(dr["dtFechaRegistro"]),
+                            bActivo = Convert.ToBoolean(dr["bActivo"])
+                        });
+                    }
+                }
             }
-
-            return null;
-        }
-
-        public async Task<string> ActualizarAsync(ColegiaturaDto dto)
-        {
-            using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand("sp_ActualizarColegiatura", connection);
-            command.CommandType = CommandType.StoredProcedure;
-
-            command.Parameters.AddWithValue("@iCodColegiatura", dto.iCodColegiatura);
-            command.Parameters.AddWithValue("@iCodPostulante", dto.iCodPostulante);
-            command.Parameters.AddWithValue("@iCodColegioProfesional", dto.iCodColegioProfesional);
-            command.Parameters.AddWithValue("@vNroColegiatura", dto.vNroColegiatura);
-            command.Parameters.AddWithValue("@bHabilitado", dto.bHabilitado);
-            command.Parameters.AddWithValue("@iCodUsuarioRegistra", dto.iCodUsuarioRegistra);
-
-            await connection.OpenAsync();
-            var result = await command.ExecuteScalarAsync();
-            return result?.ToString() ?? "Registro actualizado correctamente.";
-        }
-
-        public async Task<string> EliminarAsync(int id)
-        {
-            using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand("sp_EliminarColegiatura", connection);
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@iCodColegiatura", id);
-
-            await connection.OpenAsync();
-            var result = await command.ExecuteScalarAsync();
-            return result?.ToString() ?? "Registro eliminado lógicamente.";
+            return lista;
         }
     }
 }

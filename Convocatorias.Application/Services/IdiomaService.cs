@@ -5,17 +5,16 @@ namespace Convocatorias.Application.Services
 {
     public class IdiomaService
     {
-        private readonly IIdiomaRepository _repository;
+        private readonly IIdiomaRepository _repo;
 
-        public IdiomaService(IIdiomaRepository repository)
+        public IdiomaService(IIdiomaRepository repo)
         {
-            _repository = repository;
+            _repo = repo;
         }
 
-        public int Insert(IdiomaDTO dto) => _repository.Insert(dto);
-        public void Update(IdiomaDTO dto) => _repository.Update(dto);
-        public void Delete(int id) => _repository.Delete(id);
-        public IdiomaDTO? GetById(int id) => _repository.GetById(id);
-        public List<IdiomaDTO> GetByPostulante(int idPostulante) => _repository.GetByPostulante(idPostulante);
+        public async Task<string> InsertarAsync(IdiomaDTO dto) => await _repo.InsertarAsync(dto);
+        public async Task<IEnumerable<IdiomaDTO>> ListarAsync(int iCodUsuario) => await _repo.ListarAsync(iCodUsuario);
+        public async Task<string> ActualizarAsync(IdiomaDTO dto) => await _repo.ActualizarAsync(dto);
+        public async Task<string> EliminarAsync(int iCodIdioma) => await _repo.EliminarAsync(iCodIdioma);
     }
 }
