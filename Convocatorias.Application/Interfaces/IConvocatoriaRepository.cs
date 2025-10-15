@@ -17,5 +17,16 @@ namespace Convocatorias.Application.Interfaces
         Task<ResponseDto> ActualizarAsync(ConvocatoriaUpdateDto dto);
 
         Task<ResponseDto> EliminarAsync(int idConvocatoria);
+
+         
+            Task<List<ConvocatoriaConFaseDto>> ListarConvocatoriasConFasePaginado(
+                int? iCodTipoConvocatoria,
+                int? iCodUnidadZonal,
+                DateTime? FechaInicio,
+                DateTime? FechaFin,
+                string? FiltroGeneral,
+                int PageNumber,
+                int PageSize);
+         
     }
 }

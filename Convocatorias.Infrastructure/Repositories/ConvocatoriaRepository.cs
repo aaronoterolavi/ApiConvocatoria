@@ -193,5 +193,67 @@ namespace Convocatorias.Infrastructure.Repositories
             }
             return new ResponseDto { Id = 0, Mensaje = "No se pudo eliminar", Codigo = 0 };
         }
+
+        public async Task<List<ConvocatoriaConFaseDto>> ListarConvocatoriasConFasePaginado(
+            int? iCodTipoConvocatoria,
+            int? iCodUnidadZonal,
+            DateTime? FechaInicio,
+            DateTime? FechaFin,
+            string? FiltroGeneral,
+            int PageNumber,
+            int PageSize)
+        {
+            var lista = new List<ConvocatoriaConFaseDto>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("PA_ListarConvocatoriasConFasePaginado", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@iCodTipoConvocatoria", (object?)iCodTipoConvocatoria ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@iCodUnidadZonal", (object?)iCodUnidadZonal ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@FechaInicio", (object?)FechaInicio ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@FechaFin", (object?)FechaFin ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@FiltroGeneral", (object?)FiltroGeneral ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@PageNumber", PageNumber);
+                cmd.Parameters.AddWithValue("@PageSize", PageSize);
+
+                await conn.OpenAsync();
+
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        lista.Add(new ConvocatoriaConFaseDto
+                        {
+                            iCodEstadoConvocatoria = reader["iCodEstadoConvocatoria"].ToString() ?? "",
+                            vEstadoConvocatoria = reader["vEstadoConvocatoria"].ToString() ?? "",
+                            iCodConvocatoria = Convert.ToInt32(reader["iCodConvocatoria"]),
+                            vTitulo = reader["vTitulo"].ToString() ?? "",
+                            iCodTipoConvocatoria = Convert.ToInt32(reader["iCodTipoConvocatoria"]),
+                            vTipoConvocatoria = reader["vTipoConvocatoria"].ToString() ?? "",
+                            dtFechaInicio = Convert.ToDateTime(reader["dtFechaInicio"]),
+                            dtFechaFin = Convert.ToDateTime(reader["dtFechaFin"]),
+                            vRequisitos = reader["vRequisitos"].ToString() ?? "",
+                            iCodUnidadZonal = Convert.ToInt32(reader["iCodUnidadZonal"]),
+                            vUnidadZonal = reader["vUnidadZonal"].ToString() ?? "",
+                            iCodUsuarioRegistra = Convert.ToInt32(reader["iCodUsuarioRegistra"]),
+                            dtFechaRegistro = Convert.ToDateTime(reader["dtFechaRegistro"]),
+                            bActivo = Convert.ToBoolean(reader["bActivo"])
+                        });
+                    }
+
+                    // Segunda consulta: total de registros
+                    if (await reader.NextResultAsync() && await reader.ReadAsync())
+                    {
+                        int total = Convert.ToInt32(reader["TotalRegistros"]);
+                        foreach (var item in lista)
+                            item.TotalRegistros = total;
+                    }
+                }
+            }
+
+            return lista;
+        }
     }
 }

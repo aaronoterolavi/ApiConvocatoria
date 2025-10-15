@@ -61,5 +61,21 @@ namespace Convocatorias.Api.Controllers
             var result = await _service.EliminarAsync(idConvocatoria);
             return result.Codigo == 1 ? Ok(result) : BadRequest(result);
         }
+
+        [HttpGet("listar-paginado-conFase")]
+        public async Task<IActionResult> ListarConvocatoriasConFasePaginado(
+            int? iCodTipoConvocatoria = null,
+            int? iCodUnidadZonal = null,
+            DateTime? FechaInicio = null,
+            DateTime? FechaFin = null,
+            string? FiltroGeneral = null,
+            int PageNumber = 1,
+            int PageSize = 10)
+        {
+            var resultado = await _service.ListarConvocatoriasConFasePaginado(
+                iCodTipoConvocatoria, iCodUnidadZonal, FechaInicio, FechaFin, FiltroGeneral, PageNumber, PageSize);
+
+            return Ok(resultado);
+        }
     }
 }

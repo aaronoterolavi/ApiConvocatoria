@@ -47,5 +47,20 @@ namespace Convocatorias.Application.Services
         {
             return await _repo.EliminarAsync(idConvocatoria);
         }
+
+        public async Task<List<ConvocatoriaConFaseDto>> ListarConvocatoriasConFasePaginado(
+          int? iCodTipoConvocatoria,
+          int? iCodUnidadZonal,
+          DateTime? FechaInicio,
+          DateTime? FechaFin,
+          string? FiltroGeneral,
+          int PageNumber,
+          int PageSize)
+        {
+            return await _repo.ListarConvocatoriasConFasePaginado(
+                iCodTipoConvocatoria, iCodUnidadZonal, FechaInicio, FechaFin, FiltroGeneral, PageNumber, PageSize);
+        }
+
+
     }
 }
