@@ -12,12 +12,13 @@ using Microsoft.Extensions.FileProviders; // 👈 Importante para FileProvider
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularDevClient", policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials(); // Opcional, si usas cookies o autenticación con credenciales
+        policy
+            .AllowAnyOrigin()   // 👈 Permite cualquier origen (todas las IPs y dominios)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+            // ⚠️ No agregar .AllowCredentials() aquí, ya que es incompatible con AllowAnyOrigin()
     });
 });
 
@@ -179,7 +180,10 @@ var app = builder.Build();
     app.UseSwaggerUI();
 //}
 
-app.UseCors("AllowAngularDevClient");
+// ==============================================
+// 🧩 USAR CORS EN TODAS LAS RUTAS
+// ==============================================
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
