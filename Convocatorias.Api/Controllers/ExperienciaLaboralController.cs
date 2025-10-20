@@ -39,9 +39,16 @@ namespace Convocatorias.Api.Controllers
         [HttpPut("{id}")]
         public IActionResult Actualizar(int id, [FromBody] ExperienciaLaboralDto dto)
         {
-            dto.iCodExperienciaLaboral = id;
-            _service.Actualizar(dto);
-            return NoContent();
+            try
+            {
+                dto.iCodExperienciaLaboral = id;
+                _service.Actualizar(dto);
+                return Ok(new { mensaje = "Registro actualizado correctamente" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { mensaje = ex.Message, detalle = ex.StackTrace });
+            }
         }
 
         [HttpDelete("{id}")]

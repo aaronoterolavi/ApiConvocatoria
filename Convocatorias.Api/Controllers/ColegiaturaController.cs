@@ -41,7 +41,7 @@ namespace Convocatorias.Api.Controllers
         {
             dto.iCodColegiatura = id;
             _service.Actualizar(dto);
-            return NoContent();
+            return Ok(new { mensaje = "Registro actualizado correctamente" });
         }
 
         [HttpDelete("{id}")]

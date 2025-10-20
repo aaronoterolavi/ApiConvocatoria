@@ -8,8 +8,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.FileProviders; // 👈 Importante para FileProvider
+using QuestPDF.Infrastructure;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+QuestPDF.Settings.License = LicenseType.Community;
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -127,6 +132,12 @@ builder.Services.AddScoped<BonificacionesAdicionalesService>();
 
 builder.Services.AddScoped<IDeclaracionJuradaPostulanteRepository, DeclaracionJuradaPostulanteRepository>();
 builder.Services.AddScoped<DeclaracionJuradaPostulanteService>();
+
+builder.Services.AddScoped<IFichaCurricularRepository, FichaCurricularRepository>();
+builder.Services.AddScoped<FichaCurricularService>();
+
+builder.Services.AddScoped<IPostulacionRepository, PostulacionRepository>();
+builder.Services.AddScoped<PostulacionService>();
 
 // -----------------------------------------------------------------------------
 // Controllers y Swagger
