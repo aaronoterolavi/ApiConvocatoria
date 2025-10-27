@@ -142,6 +142,10 @@ builder.Services.AddScoped<PostulacionService>();
 builder.Services.AddScoped<IArchivoPostulacionRepository, ArchivoPostulacionRepository>();
 builder.Services.AddScoped<ArchivoPostulacionService>();
 
+builder.Services.AddScoped<IFormatoArchivoPostulacionRepository, FormatoArchivoPostulacionRepository>();
+builder.Services.AddScoped<FormatoArchivoPostulacionService>();
+
+
 
 // -----------------------------------------------------------------------------
 // Controllers y Swagger
