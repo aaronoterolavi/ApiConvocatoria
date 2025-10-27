@@ -105,7 +105,7 @@ namespace Convocatorias.Infrastructure.Repositories
                     bActivo = reader["bActivo"] != DBNull.Value && Convert.ToBoolean(reader["bActivo"]),
                     vNombreArchivo = resultado,
 
-                    // ✅ URL pública con carpeta "convocatoria"
+                    //  URL pública con carpeta "convocatoria"
                     UrlArchivo = $"{_baseUrl.TrimEnd('/')}{_requestPath}{rutaArchivo}"
 
                 });

@@ -163,12 +163,14 @@ namespace Convocatorias.Infrastructure.Repositories
             cmd.Parameters.AddWithValue("@iCodConvocatoria", (object?)iCodConvocatoria ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@iCodTipoConvocatoria", (object?)iCodTipoConvocatoria ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@iCodUnidadZonal", (object?)iCodUnidadZonal ?? DBNull.Value);
+          
 
             cmd.Parameters.AddWithValue("@vNumDocumento", (object?)vNumDocumento ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@vNombreCompleto", (object?)vNombreCompleto ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@vTituloConvocatoria", (object?)vTituloConvocatoria ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@vTipoConvocatoria", (object?)vTipoConvocatoria ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@vUnidadZonal", (object?)vUnidadZonal ?? DBNull.Value);
+            
 
             cmd.Parameters.AddWithValue("@FechaPostulacionDesde", (object?)FechaPostulacionDesde ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@FechaPostulacionHasta", (object?)FechaPostulacionHasta ?? DBNull.Value);
@@ -194,6 +196,8 @@ namespace Convocatorias.Infrastructure.Repositories
                     vTituloConvocatoria = Get<string?>(dr, "vTituloConvocatoria"),
                     iCodTipoConvocatoria = Get<int?>(dr, "iCodTipoConvocatoria"),
                     vTipoConvocatoria = Get<string?>(dr, "vTipoConvocatoria"),
+                    iCodEstadoConvocatoria = Get<int?>(dr, "iCodEstadoConvocatoria"),
+                    vEstadoConvocatoria = Get<string?>(dr, "vEstadoConvocatoria"),
                     iCodUnidadZonal = Get<int?>(dr, "iCodUnidadZonal"),
                     vUnidadZonal = Get<string?>(dr, "vUnidadZonal"),
                     dtFechaInicio = Get<DateTime?>(dr, "dtFechaInicio"),

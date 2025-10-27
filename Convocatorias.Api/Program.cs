@@ -7,7 +7,7 @@ using Convocatorias.Infrastructure.Storage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.FileProviders; // 👈 Importante para FileProvider
+using Microsoft.Extensions.FileProviders; //  Importante para FileProvider
 using QuestPDF.Infrastructure;
 
 
@@ -20,10 +20,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
     {
         policy
-            .AllowAnyOrigin()   // 👈 Permite cualquier origen (todas las IPs y dominios)
+            .AllowAnyOrigin()   //  Permite cualquier origen (todas las IPs y dominios)
             .AllowAnyHeader()
             .AllowAnyMethod();
-            // ⚠️ No agregar .AllowCredentials() aquí, ya que es incompatible con AllowAnyOrigin()
+            //  No agregar .AllowCredentials() aquí, ya que es incompatible con AllowAnyOrigin()
     });
 });
 
@@ -138,6 +138,10 @@ builder.Services.AddScoped<FichaCurricularService>();
 
 builder.Services.AddScoped<IPostulacionRepository, PostulacionRepository>();
 builder.Services.AddScoped<PostulacionService>();
+
+builder.Services.AddScoped<IArchivoPostulacionRepository, ArchivoPostulacionRepository>();
+builder.Services.AddScoped<ArchivoPostulacionService>();
+
 
 // -----------------------------------------------------------------------------
 // Controllers y Swagger

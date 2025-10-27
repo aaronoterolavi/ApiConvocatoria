@@ -22,6 +22,8 @@ namespace Convocatorias.Application.DTOs
         public string? vTituloConvocatoria { get; set; }
         public int? iCodTipoConvocatoria { get; set; }
         public string? vTipoConvocatoria { get; set; }
+        public int? iCodEstadoConvocatoria  { get; set; }
+        public string? vEstadoConvocatoria { get; set; }
         public int? iCodUnidadZonal { get; set; }
         public string? vUnidadZonal { get; set; }
 
