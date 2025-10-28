@@ -15,7 +15,7 @@ namespace Convocatorias.Application.Services
             _repo = repo;
         }
 
-        public Task<string> InsertarAsync(int iCodUsuario, int iCodConvocatoria, int iCodUsuarioRegistra)
+        public Task<(string Mensaje,int? iCodPostulacion)> InsertarAsync(int iCodUsuario, int iCodConvocatoria, int iCodUsuarioRegistra)
             => _repo.InsertarAsync(iCodUsuario, iCodConvocatoria, iCodUsuarioRegistra);
 
         public Task<string> ActualizarAsync(int iCodPostulacion, int iCodUsuario, int iCodConvocatoria, int iCodUsuarioRegistra)

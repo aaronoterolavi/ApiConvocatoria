@@ -7,7 +7,7 @@ namespace Convocatorias.Application.Interfaces
 {
     public interface IPostulacionRepository
     {
-        Task<string> InsertarAsync(int iCodUsuario, int iCodConvocatoria, int iCodUsuarioRegistra);
+        Task<(string Mensaje, int? iCodPostulacion)> InsertarAsync(int iCodUsuario, int iCodConvocatoria, int iCodUsuarioRegistra);
         Task<string> ActualizarAsync(int iCodPostulacion, int iCodUsuario, int iCodConvocatoria, int iCodUsuarioRegistra);
         Task<string> EliminarAsync(int iCodPostulacion);
 

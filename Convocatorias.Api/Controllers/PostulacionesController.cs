@@ -21,17 +21,23 @@ namespace Convocatorias.Api.Controllers
         /// <summary>
         /// Inserta una postulación usando PA_InsertarPostulacion
         /// Body esperado: { "iCodUsuario":1, "iCodConvocatoria":2, "iCodUsuarioRegistra":3 }
-        
+
         [HttpPost("insertar")]
         public async Task<IActionResult> Insertar([FromBody] PostulacionDto body)
         {
-            if (body == null) return BadRequest("Body requerido.");
-            var msg = await _service.InsertarAsync(body.iCodUsuario, body.iCodConvocatoria, body.iCodUsuarioRegistra ?? 0);
+            if (body == null)
+                return BadRequest("Body requerido.");
 
-            if (msg.StartsWith("Error", StringComparison.OrdinalIgnoreCase))
-                return BadRequest(new { mensaje = msg });
+            var result = await _service.InsertarAsync(body.iCodUsuario, body.iCodConvocatoria, body.iCodUsuarioRegistra ?? 0);
 
-            return Ok(new { mensaje = msg });
+            if (result.Mensaje.StartsWith("Error", StringComparison.OrdinalIgnoreCase))
+                return BadRequest(new { mensaje = result.Mensaje });
+
+            return Ok(new
+            {
+                mensaje = result.Mensaje,
+                iCodPostulacion = result.iCodPostulacion
+            });
         }
 
         /// <summary>

@@ -19,7 +19,7 @@ namespace Convocatorias.Infrastructure.Repositories
                 ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
-        public async Task<string> InsertarAsync(int iCodUsuario, int iCodConvocatoria, int iCodUsuarioRegistra)
+        public async Task<(string Mensaje, int? iCodPostulacion)> InsertarAsync(int iCodUsuario, int iCodConvocatoria, int iCodUsuarioRegistra)
         {
             await using var cn = new SqlConnection(_connectionString);
             await using var cmd = new SqlCommand("[dbo].[PA_InsertarPostulacion]", cn);
@@ -35,15 +35,25 @@ namespace Convocatorias.Infrastructure.Repositories
             };
             cmd.Parameters.Add(mensajeParam);
 
+            var idParam = new SqlParameter("@iCodPostulacion", SqlDbType.Int)
+            {
+                Direction = ParameterDirection.Output
+            };
+            cmd.Parameters.Add(idParam);
+
             await cn.OpenAsync();
             try
             {
                 await cmd.ExecuteNonQueryAsync();
-                return (mensajeParam.Value ?? string.Empty).ToString()!;
+
+                var mensaje = mensajeParam.Value?.ToString() ?? string.Empty;
+                var id = idParam.Value != DBNull.Value ? Convert.ToInt32(idParam.Value) : (int?)null;
+
+                return (mensaje, id);
             }
             catch (SqlException ex)
             {
-                return ex.Message;
+                return (ex.Message, null);
             }
         }
 
