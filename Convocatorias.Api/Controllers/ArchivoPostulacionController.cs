@@ -47,10 +47,11 @@ namespace Convocatorias.Api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("listar-por-postulacion")]
-        public async Task<IActionResult> ListarPorPostulacion([FromQuery] int iCodPostulacion, [FromQuery] int? iCodFormato = null)
+        [HttpGet("listar-por-Postulante")]
+        public async Task<IActionResult> ListarPorPostulacion([FromQuery] int? iCodConvocatoria = null,
+     [FromQuery] int? iCodUsuario = null)
         {
-            var result = await _service.ListarPorPostulacionAsync(iCodPostulacion, iCodFormato);
+            var result = await _service.ListarPorPostulacionAsync(iCodConvocatoria, iCodUsuario);
             return Ok(result);
         }
     }

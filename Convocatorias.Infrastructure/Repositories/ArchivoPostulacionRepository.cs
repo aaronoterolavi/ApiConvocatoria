@@ -79,8 +79,9 @@ namespace Convocatorias.Infrastructure.Repositories
         }
 
         public async Task<IEnumerable<ArchivoPostulacionListadoDto>> ListarPorPostulacionAsync(
-          int iCodPostulacion,
-          int? iCodFormato = null)
+     
+     int? iCodConvocatoria = null,
+     int? iCodUsuario = null)
         {
             var archivos = new List<ArchivoPostulacionListadoDto>();
 
@@ -88,12 +89,11 @@ namespace Convocatorias.Infrastructure.Repositories
             using var cmd = new SqlCommand("USP_ArchivosPostulacion_ListarPorPostulacion", conn);
             cmd.CommandType = CommandType.StoredProcedure;
 
-            cmd.Parameters.AddWithValue("@iCodPostulacion", iCodPostulacion);
-
-            if (iCodFormato.HasValue)
-                cmd.Parameters.AddWithValue("@iCodFormato", iCodFormato.Value);
-            else
-                cmd.Parameters.AddWithValue("@iCodFormato", DBNull.Value);
+           
+            // Parámetros opcionales
+           
+            cmd.Parameters.AddWithValue("@iCodConvocatoria", iCodConvocatoria.HasValue ? iCodConvocatoria.Value : DBNull.Value);
+            cmd.Parameters.AddWithValue("@iCodUsuario", iCodUsuario.HasValue ? iCodUsuario.Value : DBNull.Value);
 
             await conn.OpenAsync();
             using var reader = await cmd.ExecuteReaderAsync();
@@ -101,8 +101,6 @@ namespace Convocatorias.Infrastructure.Repositories
             while (await reader.ReadAsync())
             {
                 var rutaArchivo = reader["vRutaArchivo"].ToString() ?? string.Empty;
-
-                // 🔹 Normalizar separadores
                 rutaArchivo = rutaArchivo.Replace("\\", "/");
 
                 // 1️⃣ Obtener el nombre del archivo con extensión
@@ -119,6 +117,7 @@ namespace Convocatorias.Infrastructure.Repositories
                     iCodArchivo = reader["iCodArchivo"] != DBNull.Value ? Convert.ToInt32(reader["iCodArchivo"]) : 0,
                     iCodPostulacion = reader["iCodPostulacion"] != DBNull.Value ? Convert.ToInt32(reader["iCodPostulacion"]) : 0,
                     iCodConvocatoria = reader["iCodConvocatoria"] != DBNull.Value ? Convert.ToInt32(reader["iCodConvocatoria"]) : 0,
+                    iCodUsuario = reader["iCodUsuario"] != DBNull.Value ? Convert.ToInt32(reader["iCodUsuario"]) : 0,
                     iCodFormato = reader["iCodFormato"] != DBNull.Value ? Convert.ToInt32(reader["iCodFormato"]) : 0,
                     vDescFormato = reader["vDescFormato"].ToString() ?? string.Empty,
                     vRutaArchivo = rutaArchivo,
@@ -134,6 +133,7 @@ namespace Convocatorias.Infrastructure.Repositories
 
             return archivos;
         }
-    
-}
+
+
+    }
 }

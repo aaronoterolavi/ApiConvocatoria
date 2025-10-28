@@ -13,8 +13,9 @@ namespace Convocatorias.Application.Interfaces
         Task<List<ArchivoPostulacionDto>> ListarAsync();
         //    Task<List<ArchivoPostulacionListadoDto>> ListarPorPostulacionAsync(int iCodPostulacion, int? iCodFormato);
         Task<IEnumerable<ArchivoPostulacionListadoDto>> ListarPorPostulacionAsync(
-          int iCodPostulacion,
-          int? iCodFormato = null);
+          
+           int? iCodConvocatoria = null,
+     int? iCodUsuario = null);
          
         }
 }

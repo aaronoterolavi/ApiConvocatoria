@@ -51,9 +51,10 @@ namespace Convocatorias.Application.Services
             return resultados;
         }
 
-        public async Task<IEnumerable<ArchivoPostulacionListadoDto>> ListarPorPostulacionAsync(int iCodPostulacion, int? iCodFormato)
+        public async Task<IEnumerable<ArchivoPostulacionListadoDto>> ListarPorPostulacionAsync(  int? iCodConvocatoria = null,
+     int? iCodUsuario = null)
         {
-            return await _repo.ListarPorPostulacionAsync(iCodPostulacion, iCodFormato);
+            return await _repo.ListarPorPostulacionAsync(  iCodConvocatoria, iCodUsuario);
         }
 
         public async Task<List<ArchivoPostulacionDto>> ListarAsync()

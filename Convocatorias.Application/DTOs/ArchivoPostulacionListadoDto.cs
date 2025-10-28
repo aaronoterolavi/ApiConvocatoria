@@ -11,6 +11,7 @@ namespace Convocatorias.Application.DTOs
         public int iCodArchivo { get; set; }
         public int iCodPostulacion { get; set; }
         public int iCodConvocatoria { get; set; }
+        public int iCodUsuario { get; set; }
         public int iCodFormato { get; set; }
         public string vDescFormato { get; set; }
         public string vRutaArchivo { get; set; }
