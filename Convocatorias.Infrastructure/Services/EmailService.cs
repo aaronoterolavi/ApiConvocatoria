@@ -44,6 +44,8 @@ namespace Convocatorias.Infrastructure.Services
             await client.SendMailAsync(message);
         }
 
+
+
         private string GetHtmlTemplate(string nombre, string enlace)
         {
             // Usa el HTML que me diste, reemplaza [Enlace de Restablecimiento] y [Nombre del usuario]
@@ -186,5 +188,185 @@ namespace Convocatorias.Infrastructure.Services
                        .Replace("[Nombre del usuario]", nombre ?? "");
             return html;
         }
+
+
+
+        public async Task SendUserCreatedEmailAsync(
+string toEmail,
+string displayName,
+string usuario,
+string loginUrl)
+        {
+            var s = _config.GetSection("EmailSettings");
+
+            using var message = new MailMessage
+            {
+                From = new MailAddress(s["From"]!, s["DisplayName"] ?? "Sistema de Convocatorias"),
+                Subject = "Creación de usuario – Sistema de Convocatorias",
+                Body = GetUserCreatedHtmlTemplate(displayName, usuario, loginUrl),
+                IsBodyHtml = true
+            };
+
+            message.To.Add(toEmail);
+
+            using var client = new SmtpClient(s["SmtpServer"], int.Parse(s["Port"]!))
+            {
+                Credentials = new NetworkCredential(s["User"], s["Password"]),
+                EnableSsl = bool.Parse(s["EnableSsl"]!)
+            };
+
+            await client.SendMailAsync(message);
+        }
+
+        private string GetUserCreatedHtmlTemplate(string nombre, string usuario, string loginUrl)
+        {
+            var html = @"<!DOCTYPE html>
+<html lang=""es"">
+
+<head>
+  <meta charset=""UTF-8"" />
+  <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
+  <title>Bienvenido al Sistema de Convocatorias</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
+      color: #333333;
+    }
+
+    a {
+      color: #1a73e8;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+      border: 1px solid #ddd;
+    }
+
+    .header {
+      background-color: #28a745;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header img {
+      max-height: 50px;
+    }
+
+    .body {
+      padding: 30px 40px;
+    }
+
+    .body h1 {
+      color: #28a745;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .body p {
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .btn-action {
+      display: inline-block;
+      background-color: #28a745;
+      color: white !important;
+      font-weight: 600;
+      text-align: center;
+      padding: 14px 28px;
+      border-radius: 6px;
+      font-size: 16px;
+      margin: 20px 0;
+      cursor: pointer;
+    }
+
+    .footer {
+      background-color: #f0f0f0;
+      text-align: center;
+      font-size: 13px;
+      color: #777;
+      padding: 15px 20px;
+      border-top: 1px solid #ddd;
+    }
+
+    @media only screen and (max-width: 620px) {
+      .container {
+        width: 95% !important;
+        margin: 10px auto;
+      }
+
+      .body {
+        padding: 20px 15px;
+      }
+
+      .body h1 {
+        font-size: 24px;
+      }
+
+      .btn-action {
+        width: 100%;
+        padding: 14px 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class=""container"" role=""main"">
+    <div class=""header"">
+      <img src=""https://intranet.agrorural.gob.pe/mesadepartes/Images/agrorural.png"" alt=""Logo AgroRural"" />
+    </div>
+
+    <div class=""body"">
+      <h1>¡Bienvenido!</h1>
+
+      <p>Hola,
+        <!-- <strong>[Nombre del usuario]</strong> -->
+      </p>
+
+      <p>Tu cuenta ha sido creada correctamente en el <strong>Sistema de Convocatorias</strong>.</p>
+ 
+      <p>Si no reconoces esta acción, por favor comunícate con el área de soporte.</p>
+
+      <p>Saludos cordiales,<br />
+        <strong>Equipo de Sistemas de Convocatorias</strong>
+      </p>
+
+      <p>
+        <a href=""https://www.gob.pe/agrorural"" target=""_blank"" rel=""noopener"">
+          Programa de Desarrollo Productivo Agrario Rural
+        </a>
+      </p>
+    </div>
+
+    <div class=""footer"">
+      <p>© 2025 Programa de Desarrollo Productivo Agrario Rural - Todos los derechos reservados</p>
+    </div>
+  </div>
+</body>
+
+</html>
+";
+
+            return html
+                .Replace("[NOMBRE]", nombre ?? "")
+                .Replace("[USUARIO]", usuario)
+                .Replace("[LOGIN_URL]", loginUrl);
+        }
+
     }
 }

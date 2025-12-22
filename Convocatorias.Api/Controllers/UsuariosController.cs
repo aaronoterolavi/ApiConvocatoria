@@ -39,8 +39,25 @@ namespace Convocatorias.Api.Controllers
             // Validación de respuesta desde el SP
             if (result.Codigo == 1)
             {
-                // Registro exitoso
-                return CreatedAtAction(nameof(Insertar), new { id = result.NuevoId }, result);
+                // 🔹 URL de login del frontend
+                var loginUrl = _config["Frontend:LoginUrl"];
+
+                // 🔹 Envío de correo NO bloqueante
+                _ = Task.Run(() =>
+                    _email.SendUserCreatedEmailAsync(
+                        usuario.CorreoElectronico, // correo destino
+                        usuario.Nombres,           // nombre a mostrar
+                        usuario.NumDocumento,      // usuario (documento)
+                        loginUrl                    // link de acceso
+                    )
+                );
+
+                // 🔹 Respuesta HTTP
+                return CreatedAtAction(
+                    nameof(Insertar),
+                    new { id = result.NuevoId },
+                    result
+                );
             }
             else if (result.Mensaje.Contains("duplicado", StringComparison.OrdinalIgnoreCase)
                   || result.Mensaje.Contains("existe", StringComparison.OrdinalIgnoreCase))
@@ -50,10 +67,11 @@ namespace Convocatorias.Api.Controllers
             }
             else
             {
-                // Error controlado (no se insertó por alguna regla de negocio)
+                // Error controlado (regla de negocio)
                 return UnprocessableEntity(result); // 422
             }
         }
+
 
         // Login (público) — devuelve token dentro de LoginResponseDto
         [AllowAnonymous]
